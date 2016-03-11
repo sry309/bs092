@@ -6,9 +6,10 @@ import json
 import MySQLdb
 import config
 from sklearn.cluster import KMeans
+from sklearn import datasets
 
-json.encode = json.dumps
-json.decode = json.loads
+json.stringify = json.dumps
+json.parse = json.loads
 
 def index():
     return 'Hello, Flask!'
@@ -36,7 +37,7 @@ def mining():
         return 'WriteBack invalid!';
     args = request.form.get('args')
     if args:
-        args = json.decode(args);
+        args = json.parse(args);
     context = {
         "target": target,
         "cols": cols,
@@ -76,3 +77,16 @@ def kmeans(context):
     cursor.close()
     conn.close()
     return 'Done...'
+
+def iris(entity):
+    iris = datasets.load_iris()
+    r = []
+    for row in iris.data:
+        elem = {
+            "col0": int(row[0] * 10) / 10.0,
+            "col1": int(row[1] * 10) / 10.0,
+            "col2": int(row[2] * 10) / 10.0,
+            "col3": int(row[3] * 10) / 10.0
+        }
+        r.append(elem)
+    return json.stringify(r)
