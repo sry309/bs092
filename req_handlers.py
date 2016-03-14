@@ -89,4 +89,4 @@ def iris(entity):
             "col3": int(row[3] * 10) / 10.0
         }
         r.append(elem)
-    return json.stringify(r)
+    return json.stringify({'Iris': r})
