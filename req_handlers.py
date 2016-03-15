@@ -3,10 +3,11 @@
 from flask import request
 import re
 import json
-import MySQLdb
 import config
 from sklearn.cluster import KMeans
 from sklearn import datasets
+import urllib2
+import time
 
 json.stringify = json.dumps
 json.parse = json.loads
@@ -22,26 +23,24 @@ def index():
         writeBack：写回的数据库，格式为\w+
         args：参数，格式为json
 """
-def mining():
+def mining(user, proj, rsrc):
     
     #获取参数
-    target = request.form['target']
-    if not re.match(r'^\w+$', target):
-        return 'Target invalid!';
+    for e in [user, proj, rsrc]:
+        if not re.match(r'^\w+$', e):
+            return json.stringify({'succ': False, 'msg': 'Target invalid!'})
     cols = request.form.get('cols')
     if cols and not re.match(r'^\d+(,\d+)*$', cols):
-        return 'Cols invalid!'
-    algo = request.form['algo']
-    writeBack = request.form['writeBack']
-    if not re.match(r'^\w+$', writeBack):
-        return 'WriteBack invalid!';
+        return json.stringify({'succ': False, 'msg': 'Cols invalid!'})
+    algo = request.form.get('algo')
     args = request.form.get('args')
     if args:
         args = json.parse(args);
     context = {
-        "target": target,
+        "user": user,
+        "proj": proj,
+        "rsrc": rsrc,
         "cols": cols,
-        "writeBack": writeBack,
         "args": args
     }
     
@@ -49,44 +48,66 @@ def mining():
     if algo == "kmeans":
         return kmeans(context)
     else:
-        return "invalid algo."
+        return json.stringify({'succ': False, 'msg': 'Unknown algo!'})
 
 def kmeans(context):
-    conn = MySQLdb.connect(host=config.db["host"], \
-                           user=config.db["username"], \
-                           passwd=config.db["password"], \
-                           port=config.db["port"], \
-                           db=config.db["name"])
-    cursor = conn.cursor()
+    url = config.rmp + '/Entity/' + \
+          context['user'] + '/' + \
+          context['proj'] + '/' + \
+          context['rsrc'] + '/'
+    jsonStr = urllib2.urlopen(urllib2.Request(url)).read().decode('utf-8')
+    data = json.parse(jsonStr)[context['rsrc']]
     
-    sql = "select * from " + context["target"]
-    cursor.execute(sql)
-    result = list(cursor.fetchall())
-    for i in range(len(result)):
-        result[i] = list(result[i])[1:] # remove id
+    idList = []
+    dataList = []
+    for elem in data:
+        idList.append(elem['id'])
+        del elem['id']
+        row = []
+        for k, v in elem.items():
+            row.append(v)
+        dataList.append(row)
         
     clf = KMeans()
-    clf.fit(result)
-    param = []
+    clf.fit(dataList)
+    
+    conn = config.getConn()
+    cursor = conn.cursor()
+    id = dbAddHistory(cursor, context, 'cluster')
+    result = []
     for i in range(len(clf.labels_)):
-        param.append([i, clf.labels_[i]])
-    sql = "insert ignore into " + context["writeBack"] + " values (%s,%s)"
-    cursor.executemany(sql, param) 
+        result.append((id, idList[i], clf.labels_[i]))
+    
+    dbWriteBack(cursor, result)
     
     conn.commit()
     cursor.close()
     conn.close()
-    return 'Done...'
+    return json.stringify({'succ': True, 'msg': 'Done...'})
 
-def iris(entity):
+def dbAddHistory(cursor, context, type):
+    sql = 'insert into history (userid, proj, rsrc, tp, tm) values (%s, %s, %s, %s, %s)'
+    ts = int(time.time())
+    cursor.execute(sql, (context['user'], context['proj'], context['rsrc'], 
+                         type, ts))
+    return cursor.lastrowid
+
+def dbWriteBack(cursor, result):
+    sql = "insert into result values (%s,%s,%s)"
+    cursor.executemany(sql, result) 
+
+def iris(user):
     iris = datasets.load_iris()
     r = []
+    id = 1
     for row in iris.data:
         elem = {
+            "id": id,
             "col0": int(row[0] * 10) / 10.0,
             "col1": int(row[1] * 10) / 10.0,
             "col2": int(row[2] * 10) / 10.0,
             "col3": int(row[3] * 10) / 10.0
         }
         r.append(elem)
-    return json.stringify({'Iris': r})
+        id += 1
+    return json.stringify({'iris': r})
