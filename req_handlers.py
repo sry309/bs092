@@ -8,6 +8,7 @@ from sklearn.cluster import KMeans
 from sklearn import datasets
 import urllib2
 import time
+import dm
 
 json.stringify = json.dumps
 json.parse = json.loads
@@ -47,26 +48,35 @@ def mining(user, proj, rsrc):
     # 调用具体算法
     if algo == "kmeans":
         return kmeans(context)
+    elif algo == "kmedoids":
+        return kmedoids(context)
     else:
         return json.stringify({'succ': False, 'msg': 'Unknown algo!'})
 
-def kmeans(context):
-    url = config.rmp + '/Entity/' + \
-          context['user'] + '/' + \
-          context['proj'] + '/' + \
-          context['rsrc'] + '/'
-    jsonStr = urllib2.urlopen(urllib2.Request(url)).read().decode('utf-8')
-    data = json.parse(jsonStr)[context['rsrc']]
+def kmedoids(context):
+    idList, dataList = getData(context)
     
-    idList = []
-    dataList = []
-    for elem in data:
-        idList.append(elem['id'])
-        del elem['id']
-        row = []
-        for k, v in elem.items():
-            row.append(v)
-        dataList.append(row)
+    _, _, oriRes = dm.kmedoids(dataList)
+    
+    conn = config.getConn()
+    cursor = conn.cursor()
+    id = dbAddHistory(cursor, context, 'cluster')
+    result = []
+    clusterId = 0
+    for medoid in oriRes.keys():
+        for i in oriRes[medoid]:
+            result.append((id, idList[i], clusterId))
+        clusterId += 1
+    
+    dbWriteBack(cursor, result)
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return json.stringify({'succ': True, 'msg': 'Done...'})
+
+def kmeans(context):
+    idList, dataList = getData(context)
         
     clf = KMeans()
     clf.fit(dataList)
@@ -95,6 +105,27 @@ def dbAddHistory(cursor, context, type):
 def dbWriteBack(cursor, result):
     sql = "insert into result values (%s,%s,%s)"
     cursor.executemany(sql, result) 
+
+def getData(context):
+    url = config.rmp + '/Entity/' + \
+          context['user'] + '/' + \
+          context['proj'] + '/' + \
+          context['rsrc'] + '/'
+    jsonStr = urllib2.urlopen(urllib2.Request(url)).read().decode('utf-8')
+    data = json.parse(jsonStr)[context['rsrc']]
+    
+    idList = []
+    dataList = []
+    for elem in data:
+        idList.append(elem['id'])
+        del elem['id']
+        row = []
+        for k, v in elem.items():
+            row.append(v)
+        dataList.append(row)
+    
+    return idList, dataList
+
 
 def iris(user):
     iris = datasets.load_iris()

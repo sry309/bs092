@@ -40,7 +40,7 @@ def totalcost(blogwords, costf, medoids_idx) :
     return total_cost, medoids
      
  
-def kmedoids(blogwords, k) :
+def kmedoids(blogwords, k=8) :
     size = len(blogwords)
     medoids_idx = random.sample([i for i in range(size)], k)
     pre_cost, medoids = totalcost(blogwords,pearson_distance,medoids_idx)
@@ -71,7 +71,7 @@ def kmedoids(blogwords, k) :
             medoids = best_res
             medoids_idx = best_choice
          
-     
+    
     return current_cost, best_choice, best_res
  
 def print_match(best_medoids, blognames) :
