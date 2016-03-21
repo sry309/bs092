@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Apriori exercise.
-Created on Fri Nov 27 11:09:03 2015
-@author: 90Zeng
-"""
+
 def loadDataSet():
     '''
     创建一个用于测试的简单的数据集

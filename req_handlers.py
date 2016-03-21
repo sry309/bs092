@@ -50,8 +50,30 @@ def mining(user, proj, rsrc):
         return kmeans(context)
     elif algo == "kmedoids":
         return kmedoids(context)
+    elif algo == "apriori":
+        return apriori(context)
     else:
         return json.stringify({'succ': False, 'msg': 'Unknown algo!'})
+
+def apriori(context):
+    idList, dataList = getData(context)
+    
+    oriRes = dm.apriori(dataList)
+    
+    conn = config.getConn()
+    cursor = conn.cursor()
+    id = dbAddHistory(cursor, context, 'assoc')
+    result = []
+    for row in oriRes:
+        result.append((id, 
+            ', '.join(row[0]) + ' -> ' + ', '.join(row[1]),
+            row[2]))
+    dbWriteBack(cursor, result)
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return json.stringify({'succ': True, 'msg': 'Done...'})
 
 def kmedoids(context):
     idList, dataList = getData(context)
