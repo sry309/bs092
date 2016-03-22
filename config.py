@@ -15,4 +15,5 @@ def getConn():
                            user=db["username"], \
                            passwd=db["password"], \
                            port=db["port"], \
-                           db=db["name"])
+                           db=db["name"], \
+                           charset="utf8")

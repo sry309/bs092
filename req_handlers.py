@@ -9,6 +9,10 @@ from sklearn import datasets
 import urllib2
 import time
 import dm
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 json.stringify = json.dumps
 json.parse = json.loads
@@ -64,10 +68,15 @@ def apriori(context):
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'assoc')
     result = []
+    count = 0
     for row in oriRes:
-        result.append((id, 
-            ', '.join(row[0]) + ' -> ' + ', '.join(row[1]),
-            row[2]))
+        v = "{0} -> {1} : {2}".format(
+            ', '.join(row[0]),
+            ', '.join(row[1]),
+            row[2]
+        )
+        result.append((id, count, v))
+        count += 1
     dbWriteBack(cursor, result)
     
     conn.commit()
@@ -143,7 +152,8 @@ def getData(context):
         del elem['id']
         row = []
         for k, v in elem.items():
-            row.append(v)
+            if v != None and v != "":
+                row.append(v)
         dataList.append(row)
     
     return idList, dataList
