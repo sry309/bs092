@@ -35,8 +35,8 @@ def mining(user, proj, rsrc):
         if not re.match(r'^\w+$', e):
             return json.stringify({'succ': False, 'msg': 'Target invalid!'})
     cols = request.form.get('cols')
-    if cols and not re.match(r'^\d+(,\d+)*$', cols):
-        return json.stringify({'succ': False, 'msg': 'Cols invalid!'})
+    if cols:
+        cols = json.parse(cols);
     algo = request.form.get('algo')
     args = request.form.get('args')
     if args:
@@ -145,6 +145,7 @@ def getData(context):
     jsonStr = urllib2.urlopen(urllib2.Request(url)).read().decode('utf-8')
     data = json.parse(jsonStr)[context['rsrc']]
     
+    cols = context["cols"]
     idList = []
     dataList = []
     for elem in data:
@@ -152,7 +153,8 @@ def getData(context):
         del elem['id']
         row = []
         for k, v in elem.items():
-            if v != None and v != "":
+            if (v != None and v != "") and \
+               (not cols or k in cols):
                 row.append(v)
         dataList.append(row)
     
