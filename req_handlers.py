@@ -37,6 +37,8 @@ def mining(user, proj, rsrc):
     cols = request.form.get('cols')
     if cols:
         cols = json.parse(cols);
+    else:
+        cols = []
     algo = request.form.get('algo')
     args = request.form.get('args')
     if args:
@@ -154,7 +156,7 @@ def getData(context):
         row = []
         for k, v in elem.items():
             if (v != None and v != "") and \
-               (not cols or k in cols):
+               (len(cols) == 0 or k in cols):
                 row.append(v)
         dataList.append(row)
     
