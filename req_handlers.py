@@ -22,11 +22,10 @@ def index():
 
 """
     参数：
-        target：目标数据表的名称，格式为\w+
-        cols：表中的列序号，格式为\d+(,\d+)*
+        cols：列名称的列表
+        rows：记录的偏移（可选）及数量
         algo：所使用的算法
-        writeBack：写回的数据库，格式为\w+
-        args：参数，格式为json
+        args：算法所需的参数，格式为json
 """
 def mining(user, proj, rsrc):
     
@@ -34,20 +33,39 @@ def mining(user, proj, rsrc):
     for e in [user, proj, rsrc]:
         if not re.match(r'^\w+$', e):
             return json.stringify({'succ': False, 'msg': 'Target invalid!'})
+    
+    # cols=["col0","col1","col2", ...]
     cols = request.form.get('cols')
     if cols:
-        cols = json.parse(cols);
+        cols = json.parse(cols)
     else:
         cols = []
+    assert isinstance(cols, list)
+    
+    # rows=[start, count]
+    rows = request.form.get('rows')
+    if rows:
+        rows = json.parse(rows)
+    else:
+        rows = []
+    assert isinstance(rows, list)
+    
+    
     algo = request.form.get('algo')
+    
     args = request.form.get('args')
     if args:
         args = json.parse(args);
+    else:
+        args = {}
+    assert isinstance(args, dict)
+    
     context = {
         "user": user,
         "proj": proj,
         "rsrc": rsrc,
         "cols": cols,
+        "rows": rows,
         "args": args
     }
     
@@ -160,7 +178,16 @@ def getData(context):
                 row.append(v)
         dataList.append(row)
     
-    return idList, dataList
+    rows = context["rows"]
+    if len(rows) == 0:
+        rows = [0, None]
+    elif len(rows) == 1:
+        rows *= 2
+        rows[0] = 0
+    else:
+        rows[1] += rows[0]
+    
+    return idList[rows[0]:rows[1]], dataList[rows[0]:rows[1]]
 
 
 def iris(user):
