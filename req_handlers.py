@@ -38,27 +38,37 @@ def mining(user, proj, rsrc):
     cols = request.form.get('cols')
     if cols:
         cols = json.parse(cols)
+        assert isinstance(cols, list)
     else:
         cols = []
-    assert isinstance(cols, list)
     
     # rows=[start, count]
     rows = request.form.get('rows')
     if rows:
         rows = json.parse(rows)
+        assert isinstance(rows, list)
     else:
         rows = []
-    assert isinstance(rows, list)
+    rows = handleRowsArr(rows)
     
+    # predict=[start, count]
+    predict = request.form.get('predict')
+    if predict:
+        predict = json.parse(predict)
+        assert isinstance(predict, list)
+    else:
+        predict = []
+    predict = handleRowsArr(predict)
     
     algo = request.form.get('algo')
+    label = request.form.get('label')
     
     args = request.form.get('args')
     if args:
-        args = json.parse(args);
+        args = json.parse(args)
+        assert isinstance(args, dict)
     else:
         args = {}
-    assert isinstance(args, dict)
     
     context = {
         "user": user,
@@ -66,7 +76,9 @@ def mining(user, proj, rsrc):
         "rsrc": rsrc,
         "cols": cols,
         "rows": rows,
-        "args": args
+        "args": args,
+        "label" : label,
+        "predict": predict
     }
     
     # 调用具体算法
@@ -157,20 +169,33 @@ def dbWriteBack(cursor, result):
     sql = "insert into result values (%s,%s,%s)"
     cursor.executemany(sql, result) 
 
-def getData(context):
+def getDataFromSvr(user, proj, rsrc):
     url = config.rmp + '/Entity/' + \
-          context['user'] + '/' + \
-          context['proj'] + '/' + \
-          context['rsrc'] + '/'
+          user + '/' + \
+          proj + '/' + \
+          rsrc + '/'
     jsonStr = urllib2.urlopen(urllib2.Request(url)).read().decode('utf-8')
-    data = json.parse(jsonStr)[context['rsrc']]
+    return json.parse(jsonStr)[rsrc]
+
+def convertData(data, start = 0, end = None, cols = [], label = None):
+    """
+    将对象数组转化为二维数组，
+    将id单独拿出来存为数组，
+    如有标签将其去除，
+    最后将数组切片。
+    """
     
-    cols = context["cols"]
     idList = []
     dataList = []
+    labelList = []
     for elem in data:
         idList.append(elem['id'])
         del elem['id']
+        
+        if(label):
+            labelList.append(elem[label])
+            del elem[label]
+        
         row = []
         for k, v in elem.items():
             if (v != None and v != "") and \
@@ -178,17 +203,45 @@ def getData(context):
                 row.append(v)
         dataList.append(row)
     
-    rows = context["rows"]
+    return idList[start:end], \
+        dataList[start:end], labelList[start:end]
+
+def handleRowsArr(rows):
     if len(rows) == 0:
-        rows = [0, None]
+        rows =  [0, None]
     elif len(rows) == 1:
         rows *= 2
         rows[0] = 0
     else:
         rows[1] += rows[0]
-    
-    return idList[rows[0]:rows[1]], dataList[rows[0]:rows[1]]
+    return rows
 
+def getData(context):
+    rawData = getDataFromSvr(context['user'], \
+        context['proj'], context['rsrc'])
+        
+    cols = context['cols']
+    rows = context['rows']
+    idList, dataList, _ = convertData(rawData, rows[0], rows[1], cols)
+    
+    return idList, dataList
+
+def getDataWithLabel(context):
+    rawData = getDataFromSvr(context['user'], \
+        context['proj'], context['rsrc'])
+    
+    cols = context['cols']
+    rows = context['rows']
+    predict = context['predict']
+    label = context['label']
+    
+    # 训练集
+    _, dataList, labelList = convertData(rawData, rows[0], rows[1], cols, label)
+    
+    # 测试集
+    idList, pridictList, _ = convertData(rawData, predict[0], predict[1], cols)
+    
+    return dataList, labelList, idList, pridictList
 
 def iris(user):
     iris = datasets.load_iris()
