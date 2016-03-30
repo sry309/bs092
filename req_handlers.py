@@ -2,18 +2,15 @@
 
 from flask import request
 import re
-import json
 import config
-from sklearn.cluster import KMeans
-from sklearn import datasets
 import urllib2
 import time
-import dm
-import sys
 
+import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+import json
 json.stringify = json.dumps
 json.parse = json.loads
 
@@ -94,14 +91,15 @@ def mining(user, proj, rsrc):
 def apriori(context):
     idList, dataList = getData(context)
     
-    oriRes = dm.apriori(dataList)
+    from dm import apriori
+    rawRes = apriori(dataList)
     
     conn = config.getConn()
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'assoc')
     result = []
     count = 0
-    for row in oriRes:
+    for row in rawRes:
         v = "{0} -> {1} : {2}".format(
             ', '.join(row[0]),
             ', '.join(row[1]),
@@ -119,15 +117,16 @@ def apriori(context):
 def kmedoids(context):
     idList, dataList = getData(context)
     
-    _, _, oriRes = dm.kmedoids(dataList)
+    from dm import kmedoids
+    _, _, rawRes = kmedoids(dataList)
     
     conn = config.getConn()
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'cluster')
     result = []
     clusterId = 0
-    for medoid in oriRes.keys():
-        for i in oriRes[medoid]:
+    for medoid in rawRes.keys():
+        for i in rawRes[medoid]:
             result.append((id, idList[i], clusterId))
         clusterId += 1
     
@@ -140,7 +139,8 @@ def kmedoids(context):
 
 def kmeans(context):
     idList, dataList = getData(context)
-        
+    
+    from sklearn.cluster import KMeans
     clf = KMeans()
     clf.fit(dataList)
     
@@ -148,8 +148,37 @@ def kmeans(context):
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'cluster')
     result = []
-    for i in range(len(clf.labels_)):
+    for i in xrange(len(clf.labels_)):
         result.append((id, idList[i], clf.labels_[i]))
+    
+    dbWriteBack(cursor, result)
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return json.stringify({'succ': True, 'msg': 'Done...'})
+
+def knn(context):
+    label = context['label']
+    if not label or \
+        not re.match(r'^\w+$', label):
+            return json.stringify({'succ': False, 'msg': 'Label invalid!'})
+    
+    dataList, labelList, idList, pridictList \
+        = getDataWithLabel(context)
+    
+    from sklearn import neighbors
+    knn = neighbors.KNeighborsClassifier()
+    knn.fit(dataList, labelList)
+    rawRes = knn.predict(pridictList)
+    
+    conn = config.getConn()
+    cursor = conn.cursor()
+    id = dbAddHistory(cursor, context, 'classify')
+    
+    result = []
+    for i in xrange(len(rawRes)):
+        result.append((id, idList[i], rawRes[i]))
     
     dbWriteBack(cursor, result)
     
@@ -243,7 +272,10 @@ def getDataWithLabel(context):
     
     return dataList, labelList, idList, pridictList
 
+
+
 def iris(user):
+    from sklearn import datasets
     iris = datasets.load_iris()
     r = []
     id = 1
