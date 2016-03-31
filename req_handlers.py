@@ -73,6 +73,7 @@ def mining(user, proj, rsrc):
         "rsrc": rsrc,
         "cols": cols,
         "rows": rows,
+        "algo": algo,
         "args": args,
         "label" : label,
         "predict": predict
@@ -85,6 +86,8 @@ def mining(user, proj, rsrc):
         return kmedoids(context)
     elif algo == "apriori":
         return apriori(context)
+    elif algo in ["naive_bayes", "knn", "svm"]:
+        return classify(context)
     else:
         return json.stringify({'succ': False, 'msg': 'Unknown algo!'})
 
@@ -158,19 +161,32 @@ def kmeans(context):
     conn.close()
     return json.stringify({'succ': True, 'msg': 'Done...'})
 
-def knn(context):
+def classify(context):
     label = context['label']
     if not label or \
         not re.match(r'^\w+$', label):
             return json.stringify({'succ': False, 'msg': 'Label invalid!'})
     
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.naive_bayes import MultinomialNB 
+    from sklearn.svm import SVC 
+    
+    algo = context['algo']
+    if algo == 'svm':
+        classifier = SVC
+    elif algo == 'knn':
+        classifier = KNeighborsClassifier
+    elif algo == 'naive_bayes':
+        classifier = MultinomialNB
+    else:
+        assert False
+    
     dataList, labelList, idList, pridictList \
         = getDataWithLabel(context)
     
-    from sklearn import neighbors
-    knn = neighbors.KNeighborsClassifier()
-    knn.fit(dataList, labelList)
-    rawRes = knn.predict(pridictList)
+    clf = classifier()
+    clf.fit(dataList, labelList)
+    rawRes = clf.predict(pridictList)
     
     conn = config.getConn()
     cursor = conn.cursor()
@@ -186,6 +202,7 @@ def knn(context):
     cursor.close()
     conn.close()
     return json.stringify({'succ': True, 'msg': 'Done...'})
+
 
 def dbAddHistory(cursor, context, type):
     sql = 'insert into history (userid, proj, rsrc, tp, tm) values (%s, %s, %s, %s, %s)'
