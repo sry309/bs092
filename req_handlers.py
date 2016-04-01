@@ -235,11 +235,13 @@ def convertData(data, start = 0, end = None, cols = [], label = None):
     dataList = []
     labelList = []
     for elem in data:
-        idList.append(elem['id'])
+        elemId = elem['id']
+        idList.append(elemId)
         del elem['id']
         
         if(label):
-            labelList.append(elem[label])
+            elemLabel = elem[label]
+            labelList.append(elemLabel)
             del elem[label]
         
         row = []
@@ -248,6 +250,9 @@ def convertData(data, start = 0, end = None, cols = [], label = None):
                (len(cols) == 0 or k in cols):
                 row.append(v)
         dataList.append(row)
+        
+        elem['id'] = elemId
+        if(label): elem[label] = elemLabel
     
     return idList[start:end], \
         dataList[start:end], labelList[start:end]
@@ -285,7 +290,7 @@ def getDataWithLabel(context):
     _, dataList, labelList = convertData(rawData, rows[0], rows[1], cols, label)
     
     # 测试集
-    idList, pridictList, _ = convertData(rawData, predict[0], predict[1], cols)
+    idList, pridictList, _ = convertData(rawData, predict[0], predict[1], cols, label)
     
     return dataList, labelList, idList, pridictList
 
