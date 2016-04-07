@@ -21,3 +21,10 @@ function setUser(id, un, pw) {
     localStorage.setItem('un', un);
     localStorage.setItem('pw', pw);
 }
+
+var statusMap = {
+    1: 'View Resouce',
+    2: 'Manage Resource',
+    3: 'Delete Object',
+    4: 'Previlege Assignment'
+}
