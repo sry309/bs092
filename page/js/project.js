@@ -1,7 +1,7 @@
 $(function(){
     
     var user = getUser();
-    var url = getUrl();
+    var url = getUrl() + "/System/Project?userid=" + user.id;
     
 
     
@@ -9,9 +9,7 @@ $(function(){
     {
         $.ajax({
             type: "GET",
-            url: url + "/System/Project?userid=" + user.id,
-            //async: false,
-            timeout: 20000,
+            url: url,
             contentType: "application/xml",
             beforeSend: function (request) {
                 request.setRequestHeader("passwd", user.pw);
@@ -23,7 +21,6 @@ $(function(){
                 alert(errmsg);
             else
                 loadProj($data.find('project'));
-            
         }).fail(function(data) {
             alert('Network error!');
         });
@@ -31,7 +28,7 @@ $(function(){
     
     var loadProj = function($list)
     {
-        $('.list-row').remove();
+        $('.proj-row').remove();
         for(var i = 0; i < $list.length; i++)
         {
             var $elem = $list.eq(i);
@@ -41,19 +38,30 @@ $(function(){
             var status = parseInt($elem.find("privilege").text());
             status = statusMap[status];
             
-            var $tr = $('<tr class="list-row"></tr>');
-            var $nameTd = $('<td>' + projName + '</td>');
+            var $tr = $('<tr class="proj-row"></tr>');
+            var $nameTd = $('<td class="hidden proj-fullname">' + name + '</td>');
+            var $projNameTd = $('<td>' + projName + '</td>');
             var $timeTd = $('<td>' + time + '</td>');
             var $statusTd = $('<td>' + status + '</td>');
             var $opTd = $('<td></td>');
+            var $lookAnchor = $('<a href="#" class="proj-detail-btn">查看</a>');
+            $opTd.append($lookAnchor);
             $tr.append($nameTd);
+            $tr.append($projNameTd);
             $tr.append($timeTd);
             $tr.append($statusTd);
             $tr.append($opTd);
-            $('#list-table').append($tr);
+            $('#proj-table').append($tr);
         }
+        $('.proj-detail-btn').click(seeProj);
     };
     
+    var seeProj = function() {
+        event.preventDefault();
+        var proj = $(this).parent().parent().children('.proj-fullname').text();
+        localStorage.setItem('proj', proj);
+        location.href = './rsrc.html';
+    };
     
     getProj();
 });

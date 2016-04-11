@@ -6,7 +6,7 @@
   <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap-theme.min.css" rel="stylesheet" />
   <script src="./js/util.js"></script>
   <script src="./js/checknotlogin.js"></script>
-  <script src="./js/project.js"></script>
+  <script src="./js/rsrc.js"></script>
   <link href="./css/main.css" rel="stylesheet" />
   <script src='./js/navbar.js'></script>
 </head>
@@ -34,13 +34,13 @@
 
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <p class="panel-title">项目列表</p>
+            <p class="panel-title" id="proj-name"></p>
         </div>
-        <table class="table table-striped panel-body" id="proj-table">
+        <table class="table table-striped panel-body" id="rsrc-table">
             <tr>
                 <th>名称</th>
-                <th>时间</th>
                 <th>状态</th>
+                <th>最后修改</th>
                 <th>操作</th>
             </tr>
         </table>
