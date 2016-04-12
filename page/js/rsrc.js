@@ -38,7 +38,7 @@ $(function() {
             var lastModified = $item.children('lastmodified').text();
             
             var $tr = $('<tr class="rsrc-row"></tr>');
-            var $nameTd = $('<td>' + name + '</td>');
+            var $nameTd = $('<td class="rsrc-name">' + name + '</td>');
             var $statusTd = $('<td>' + status + '</td>');
             var $lastTd = $('<td>' + lastModified + '</td>');
             var $opTd = $('<td></td>');
@@ -59,12 +59,15 @@ $(function() {
     
     
     var viewRsrc = function() {
-        event.preventdefault()
-        
+        event.preventDefault()
+        var token = localStorage.getItem('token');
+        var proj = localStorage.getItem('proj');
+        var rsrc = $(this).parent().parent().children('.rsrc-name').text();
+        window.open(getUrl() + '/Entity/' + token + '/' + proj + '/' + rsrc + '/')
     };
     
     var mineRsrc = function() {
-        event.preventdefault()
+        event.preventDefault()
         
     };
     
