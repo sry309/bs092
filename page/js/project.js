@@ -45,18 +45,18 @@ $(function(){
             var $timeTd = $('<td>' + time + '</td>');
             var $statusTd = $('<td>' + status + '</td>');
             var $opTd = $('<td></td>');
-            var $lookAnchor = $('<a href="#" class="proj-detail-btn">查看</a>');
-            $opTd.append($lookAnchor);
+            var $viewAnchor = $('<a href="#" class="proj-view">查看</a>');
+            $opTd.append($viewAnchor);
             $tr.append($nameTd);
             $tr.append($timeTd);
             $tr.append($statusTd);
             $tr.append($opTd);
             $('#proj-table').append($tr);
         }
-        $('.proj-detail-btn').click(seeProj);
+        $('.proj-view').click(viewProj);
     };
     
-    var seeProj = function() {
+    var viewProj = function() {
         event.preventDefault();
         var proj = $(this).parent().parent().children('.proj-name').text();
         localStorage.setItem('proj', proj);

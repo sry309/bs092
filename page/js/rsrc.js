@@ -42,14 +42,31 @@ $(function() {
             var $statusTd = $('<td>' + status + '</td>');
             var $lastTd = $('<td>' + lastModified + '</td>');
             var $opTd = $('<td></td>');
+            var $viewAnchor = $('<a href="#" class="rsrc-view">查看</a>');
+            var $mineAnchor = $('<a href="#" class="rsrc-mine">挖掘</a>');
+            $opTd.append($viewAnchor);
+            $opTd.append(' ');
+            $opTd.append($mineAnchor);
             $tr.append($nameTd);
             $tr.append($statusTd);
             $tr.append($lastTd);
             $tr.append($opTd);
             $('#rsrc-table').append($tr);
         }
+        $('.rsrc-view').click(viewRsrc);
+        $('.rsrc-mine').click(mineRsrc);
     };
     
+    
+    var viewRsrc = function() {
+        event.preventdefault()
+        
+    };
+    
+    var mineRsrc = function() {
+        event.preventdefault()
+        
+    };
     
     getRsrc();
 });
