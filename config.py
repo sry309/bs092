@@ -1,4 +1,5 @@
 import MySQLdb
+import os
 
 db = {
     'host': '127.0.0.1',
@@ -9,6 +10,8 @@ db = {
 }
 
 rmp = 'http://202.120.40.73:28080'
+
+staticPath = 'page'
 
 def getConn():
     return MySQLdb.connect(host=db["host"], \
