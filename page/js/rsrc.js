@@ -3,11 +3,11 @@ $(function() {
     var getRsrc = function() {
         
         var proj = localStorage.getItem('proj');
-        var projName = proj.split("/", 2)[1];
-        $('#proj-name').text(projName);
+        var token = localStorage.getItem('token');
+        $('#proj-name').text(proj);
         
         var user = getUser();
-        var url = getUrl() + "/System/Resource/list?userid=" + user.id + "&project=" + proj;
+        var url = getUrl() + "/System/Resource/list?userid=" + user.id + "&project=" + token + '/' + proj;
         $.ajax({
             type: "GET", 
             url: url, 

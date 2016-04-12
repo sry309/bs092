@@ -33,21 +33,21 @@ $(function(){
         {
             var $elem = $list.eq(i);
             var name = $elem.find('name').text();
-            var projName = name.split("/", 2)[1];
+            var tmp = name.split("/", 2);
+            localStorage.setItem('token', tmp[0]);
+            name = tmp[1];
             var time = $elem.find('time').text();
             var status = parseInt($elem.find("privilege").text());
             status = statusMap[status];
             
             var $tr = $('<tr class="proj-row"></tr>');
-            var $nameTd = $('<td class="hidden proj-fullname">' + name + '</td>');
-            var $projNameTd = $('<td>' + projName + '</td>');
+            var $nameTd = $('<td class="proj-name">' + name + '</td>');
             var $timeTd = $('<td>' + time + '</td>');
             var $statusTd = $('<td>' + status + '</td>');
             var $opTd = $('<td></td>');
             var $lookAnchor = $('<a href="#" class="proj-detail-btn">查看</a>');
             $opTd.append($lookAnchor);
             $tr.append($nameTd);
-            $tr.append($projNameTd);
             $tr.append($timeTd);
             $tr.append($statusTd);
             $tr.append($opTd);
@@ -58,7 +58,7 @@ $(function(){
     
     var seeProj = function() {
         event.preventDefault();
-        var proj = $(this).parent().parent().children('.proj-fullname').text();
+        var proj = $(this).parent().parent().children('.proj-name').text();
         localStorage.setItem('proj', proj);
         location.href = './rsrc.html';
     };
