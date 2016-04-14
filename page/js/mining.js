@@ -16,7 +16,7 @@ $(function(){
         $.ajax({
             type: "GET", 
             url: url, 
-            contentType: "application/xml",
+            dataType: "xml",
             beforeSend: function (request) {
                 request.setRequestHeader("passwd", user.pw);
             }
@@ -72,7 +72,53 @@ $(function(){
             selected[name] = name;
         else
             delete selected[name];
+        
+        console.log(selected);
+    };
+    
+    var mining = function() {
+        
+        var user = getUser();
+        var proj = localStorage.getItem('proj');
+        var token = localStorage.getItem('token');
+        var rsrc = localStorage.getItem('rsrc');
+        
+        var algo = $('#algo-combo').val();
+        var start = $('#start-num').val();
+        var count = $('#count-num').val();
+        if(count == "-1") count = "";
+        
+        var cols = [];
+        for(var k in selected)
+            cols.push(k);
+        
+        if(cols.length == 0)
+        {
+            alert('请选择要挖掘的列！');
+            return;
+        }
+        cols = JSON.stringify(cols);
+        
+        var url = './mining/' + token + '/' + proj + '/' + rsrc + '/';
+        var data = 'algo=' + algo + '&start=' + start + "&count=" + 
+            count + '&cols=' + cols;
+        
+        $.ajax({
+            type: "POST", 
+            url: url, 
+            data: data,
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded"
+        }).done(function(data){
+           if(!data.succ)
+               alert(data.msg);
+           else
+               alert('已提交。');
+        }).fail(function(data, status, e){
+            alert("network error");
+        });
     };
     
     getCols();
+    $('#mining-btn').click(mining);
 });

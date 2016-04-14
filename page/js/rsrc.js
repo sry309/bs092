@@ -11,7 +11,7 @@ $(function() {
         $.ajax({
             type: "GET", 
             url: url, 
-            contentType: "application/xml",
+            dataType: "xml",
             beforeSend: function (request) {
                 request.setRequestHeader("passwd", user.pw);
             }

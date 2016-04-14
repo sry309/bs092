@@ -1,3 +1,14 @@
 .navbar { margin-top: 15px; }
 
 * { font-family: "Microsoft YaHei"; }
+
+.col-md-1,
+.col-md-2,
+.col-md-3,
+.col-md-4,
+.col-md-5,
+.col-md-6
+{
+  padding-top: 5px;
+  padding-bottom: 5px;
+}

@@ -39,23 +39,35 @@ def mining(user, proj, rsrc):
     else:
         cols = []
     
-    # rows=[start, count]
-    rows = request.form.get('rows')
-    if rows:
-        rows = json.parse(rows)
-        assert isinstance(rows, list)
+    # start
+    start = request.form.get('start')
+    if start:
+        start = int(start)
     else:
-        rows = []
-    rows = handleRowsArr(rows)
+        start = 0
+        
+    # count
+    count = request.form.get('count')
+    if count:
+        count = int(count)
+        end = start + count
+    else:
+        end = None
     
-    # predict=[start, count]
-    predict = request.form.get('predict')
-    if predict:
-        predict = json.parse(predict)
-        assert isinstance(predict, list)
+    # predictStart
+    predictStart = request.form.get('predictStart')
+    if predictStart:
+        predictStart = int(predictStart)
     else:
-        predict = []
-    predict = handleRowsArr(predict)
+        predictStart = 0
+        
+    # predictCount
+    predictCount = request.form.get('predictCount')
+    if predictCount:
+        predictCount = int(predictCount)
+        predictEnd = predictStart + predictCount
+    else:
+        predictEnd = None
     
     algo = request.form.get('algo')
     label = request.form.get('label')
@@ -72,11 +84,13 @@ def mining(user, proj, rsrc):
         "proj": proj,
         "rsrc": rsrc,
         "cols": cols,
-        "rows": rows,
+        "start": start,
+        "end": end,
         "algo": algo,
         "args": args,
         "label" : label,
-        "predict": predict
+        "predictStart": predictStart,
+        "predictEnd": predictEnd
     }
     
     # 调用具体算法
@@ -257,23 +271,14 @@ def convertData(data, start = 0, end = None, cols = [], label = None):
     return idList[start:end], \
         dataList[start:end], labelList[start:end]
 
-def handleRowsArr(rows):
-    if len(rows) == 0:
-        rows =  [0, None]
-    elif len(rows) == 1:
-        rows *= 2
-        rows[0] = 0
-    else:
-        rows[1] += rows[0]
-    return rows
-
 def getData(context):
     rawData = getDataFromSvr(context['user'], \
         context['proj'], context['rsrc'])
         
     cols = context['cols']
-    rows = context['rows']
-    idList, dataList, _ = convertData(rawData, rows[0], rows[1], cols)
+    start = context['start']
+    end = context['end']
+    idList, dataList, _ = convertData(rawData, start, end, cols)
     
     return idList, dataList
 
@@ -282,15 +287,17 @@ def getDataWithLabel(context):
         context['proj'], context['rsrc'])
     
     cols = context['cols']
-    rows = context['rows']
-    predict = context['predict']
+    start = context['start']
+    end = context['end']
+    predictStart = context['predictStart']
+    predictEnd = context['predictEnd']
     label = context['label']
     
     # 训练集
-    _, dataList, labelList = convertData(rawData, rows[0], rows[1], cols, label)
+    _, dataList, labelList = convertData(rawData, start, end, cols, label)
     
     # 测试集
-    idList, pridictList, _ = convertData(rawData, predict[0], predict[1], cols, label)
+    idList, pridictList, _ = convertData(rawData, predictStart, predictEnd, cols, label)
     
     return dataList, labelList, idList, pridictList
 
