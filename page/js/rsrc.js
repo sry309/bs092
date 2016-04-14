@@ -29,7 +29,7 @@ $(function() {
     };
     
     var loadRsrc = function($list) {
-        $('.proj-row').remove();
+        $('.rsrc-row').remove();
         for(var i = 0; i < $list.length; i++)
         {
             var $item = $list.eq(i);
@@ -68,7 +68,9 @@ $(function() {
     
     var mineRsrc = function() {
         event.preventDefault()
-        
+        var rsrc = $(this).parent().parent().children('.rsrc-name').text();
+        localStorage.setItem('rsrc', rsrc);
+        location.href = './mining.html';
     };
     
     getRsrc();
