@@ -119,6 +119,28 @@ $(function(){
         });
     };
     
+    var initAlgoType = function() {
+        
+        var $typeCombo = $('#type-combo');
+        for(type in algos)
+            $('<option value="' + type + '">' + algoDict[type] + '</option>').appendTo($typeCombo);
+        $typeCombo.on('change', changeAlgoType);
+        changeAlgoType.call($typeCombo);
+    };
+    
+    var changeAlgoType = function() {
+        
+        var type = $(this).val();
+        var $algoCombo = $('#algo-combo');
+        $algoCombo.empty();
+        for(var i in algos[type])
+        {
+            var algo = algos[type][i];
+            $('<option value="' + algo + '">' + algoDict[algo] + '</option>').appendTo($algoCombo);
+        }
+    };
+    
     getCols();
+    initAlgoType();
     $('#mining-btn').click(mining);
 });
