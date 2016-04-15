@@ -71,6 +71,7 @@ def mining(user, proj, rsrc):
     
     algo = request.form.get('algo')
     label = request.form.get('label')
+    if label == None: label = ""
     
     args = request.form.get('args')
     if args:
@@ -94,16 +95,18 @@ def mining(user, proj, rsrc):
     }
     
     # 调用具体算法
-    if algo == "kmeans":
-        return kmeans(context)
-    elif algo == "kmedoids":
-        return kmedoids(context)
-    elif algo == "apriori":
-        return apriori(context)
-    elif algo in ["naive_bayes", "knn", "svm"]:
-        return classify(context)
-    else:
+    funcDict = {
+        "kmeans": kmeans,
+        "kmedoids": kmedoids,
+        "apriori": apriori,
+        "naive_bayes": classify,
+        "knn": classify,
+        "svm": classify
+    }
+    func = funcDict.get(algo)
+    if not func:
         return json.stringify({'succ': False, 'msg': 'Unknown algo!'})
+    return func(context)
 
 def apriori(context):
     idList, dataList = getData(context)
@@ -176,11 +179,10 @@ def kmeans(context):
     return json.stringify({'succ': True, 'msg': 'Done...'})
 
 def classify(context):
-    label = context['label']
-    if not label or \
-        not re.match(r'^\w+$', label):
-            return json.stringify({'succ': False, 'msg': 'Label invalid!'})
-    
+
+    if not re.match(r'^\w+$', label):
+        return json.stringify({'succ': False, 'msg': 'Label invalid!'})
+
     from sklearn.neighbors import KNeighborsClassifier
     from sklearn.naive_bayes import MultinomialNB 
     from sklearn.svm import SVC 
@@ -195,12 +197,12 @@ def classify(context):
     else:
         assert False
     
-    dataList, labelList, idList, pridictList \
+    dataList, labelList, idList, predictList \
         = getDataWithLabel(context)
     
     clf = classifier()
     clf.fit(dataList, labelList)
-    rawRes = clf.predict(pridictList)
+    rawRes = clf.predict(predictList)
     
     conn = config.getConn()
     cursor = conn.cursor()
@@ -297,9 +299,9 @@ def getDataWithLabel(context):
     _, dataList, labelList = convertData(rawData, start, end, cols, label)
     
     # 测试集
-    idList, pridictList, _ = convertData(rawData, predictStart, predictEnd, cols, label)
+    idList, predictList, _ = convertData(rawData, predictStart, predictEnd, cols, label)
     
-    return dataList, labelList, idList, pridictList
+    return dataList, labelList, idList, predictList
 
 
 

@@ -83,10 +83,21 @@ $(function(){
         var token = localStorage.getItem('token');
         var rsrc = localStorage.getItem('rsrc');
         
+        var type = $('#type-combo').val();
         var algo = $('#algo-combo').val();
         var start = $('#start-num').val();
         var count = $('#count-num').val();
         if(count == "-1") count = "";
+        
+        var predictStart = $('#predict-start-num').val();
+        var predictCount = $('#predict-count-num').val();
+        if(predictCount == "-1") predictCount = "";
+        var label = $('#predict-label-text').val();
+        if(type == "classify" && label == "")
+        {
+            alert('请填写标签。');
+            return;
+        }
         
         var cols = [];
         for(var k in selected)
@@ -102,6 +113,11 @@ $(function(){
         var url = './mining/' + token + '/' + proj + '/' + rsrc + '/';
         var data = 'algo=' + algo + '&start=' + start + "&count=" + 
             count + '&cols=' + cols;
+        if(type == "classify")
+        {
+            data += '&predictStart=' + predictStart + '&predictCount=' + 
+                predictCount + '&label=' + label;
+        }
         
         $.ajax({
             type: "POST", 
@@ -138,6 +154,11 @@ $(function(){
             var algo = algos[type][i];
             $('<option value="' + algo + '">' + algoDict[algo] + '</option>').appendTo($algoCombo);
         }
+        
+        if(type == "classify")
+            $('.classify-req').removeClass('hidden');
+        else
+            $('.classify-req').addClass('hidden');
     };
     
     getCols();
