@@ -348,7 +348,7 @@ def getResult():
     cur.close()
     conn.close()
     
-    res = make_response(json.stringify(result))
+    res = make_response(json.stringify({"succ": True, "data": result}))
     res.headers["Content-Type"] = "application/json"
     return res
     
