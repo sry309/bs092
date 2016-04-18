@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import request
+from flask import request, make_response
 import re
 import config
 import urllib2
@@ -26,10 +26,14 @@ def index():
 """
 def mining(user, proj, rsrc):
     
+    res = make_response()
+    res.headers['Content-Type'] = "application/json"
+    
     #获取参数
     for e in [user, proj, rsrc]:
         if not re.match(r'^\w+$', e):
-            return json.stringify({'succ': False, 'msg': 'Target invalid!'})
+            res.data = json.stringify({'succ': False, 'msg': 'Target invalid!'})
+            return res
     
     # cols=["col0","col1","col2", ...]
     cols = request.form.get('cols')
@@ -105,8 +109,11 @@ def mining(user, proj, rsrc):
     }
     func = funcDict.get(algo)
     if not func:
-        return json.stringify({'succ': False, 'msg': 'Unknown algo!'})
-    return func(context)
+        res.data = json.stringify({'succ': False, 'msg': 'Unknown algo!'})
+        return res
+    
+    res.data = func(context)
+    return res
 
 def apriori(context):
     idList, dataList = getData(context)
@@ -321,3 +328,27 @@ def iris(user):
         r.append(elem)
         id += 1
     return json.stringify({'iris': r})
+
+def getResult():
+    conn = config.getConn()
+    cur = conn.cursor()
+    sql = "select id,userid,proj,rsrc,tp,tm from history"
+    cur.execute(sql)
+    result = []
+    for row in cur.fetchall():
+        obj = {
+            "id": row[0],
+            "uid": row[1],
+            "proj": row[2],
+            "rsrc": row[3],
+            "type": row[4],
+            "time": row[5]
+        }
+        result.append(obj)
+    cur.close()
+    conn.close()
+    
+    res = make_response(json.stringify(result))
+    res.headers["Content-Type"] = "application/json"
+    return res
+    

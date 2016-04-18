@@ -7,7 +7,7 @@ import os
 
 app = Flask(__name__)
 app.add_url_rule('/mining/<user>/<proj>/<rsrc>/', view_func=req_handlers.mining, methods=['POST'])
-app.add_url_rule('/Entity/<user>/datasets/iris/', view_func=req_handlers.iris)
+app.add_url_rule('/result/', view_func=req_handlers.getResult)
 app.debug = True
 
 @app.route('/<path:path>')
