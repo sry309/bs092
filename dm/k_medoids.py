@@ -17,7 +17,7 @@ import random
 iris = datasets.load_iris()
 
 distances_cache = {}
- 
+
 def totalcost(blogwords, costf, medoids_idx) :
     size = len(blogwords)
     total_cost = 0.0
@@ -29,7 +29,7 @@ def totalcost(blogwords, costf, medoids_idx) :
         min_cost = 2.1
         for m in medoids :
             tmp = distances_cache.get((m,i),None)
-            if tmp == None :
+            if tmp is None :
                 tmp = pearson_distance(blogwords[m],blogwords[i])
                 distances_cache[(m,i)] = tmp
             if tmp < min_cost :
@@ -38,14 +38,14 @@ def totalcost(blogwords, costf, medoids_idx) :
         medoids[choice].append(i)
         total_cost += min_cost
     return total_cost, medoids
-     
- 
+
+
 def kmedoids(blogwords, k=8) :
     size = len(blogwords)
     medoids_idx = random.sample([i for i in range(size)], k)
     pre_cost, medoids = totalcost(blogwords,pearson_distance,medoids_idx)
     print pre_cost
-    current_cost = 2.1 * size # maxmum of pearson_distances is 2.    
+    current_cost = 2.1 * size # maxmum of pearson_distances is 2.
     best_choice = []
     best_res = {}
     iter_count = 0
@@ -70,10 +70,10 @@ def kmedoids(blogwords, k=8) :
             pre_cost = current_cost
             medoids = best_res
             medoids_idx = best_choice
-         
-    
+
+
     return current_cost, best_choice, best_res
- 
+
 def print_match(best_medoids, blognames) :
     for medoid in best_medoids :
         print blognames[medoid],'----->',
@@ -81,7 +81,7 @@ def print_match(best_medoids, blognames) :
             print '(',m,blognames[m],')',
         print
         print '---------' * 20
- 
+
 if __name__ == '__main__' :
     '''
     blogwords, blognames = importData()
@@ -91,4 +91,3 @@ if __name__ == '__main__' :
     #print iris
     _, center, res = kmedoids(iris.data, 8)
     print center, "\n", res
-    

@@ -25,16 +25,16 @@ def index():
         args：算法所需的参数，格式为json
 """
 def mining(user, proj, rsrc):
-    
+
     res = make_response()
     res.headers['Content-Type'] = "application/json"
-    
+
     #获取参数
     for e in [user, proj, rsrc]:
         if not re.match(r'^\w+$', e):
             res.data = json.stringify({'succ': False, 'msg': 'Target invalid!'})
             return res
-    
+
     # cols=["col0","col1","col2", ...]
     cols = request.form.get('cols')
     if cols:
@@ -42,14 +42,14 @@ def mining(user, proj, rsrc):
         assert isinstance(cols, list)
     else:
         cols = []
-    
+
     # start
     start = request.form.get('start')
     if start:
         start = int(start)
     else:
         start = 0
-        
+
     # count
     count = request.form.get('count')
     if count:
@@ -57,14 +57,14 @@ def mining(user, proj, rsrc):
         end = start + count
     else:
         end = None
-    
+
     # predictStart
     predictStart = request.form.get('predictStart')
     if predictStart:
         predictStart = int(predictStart)
     else:
         predictStart = 0
-        
+
     # predictCount
     predictCount = request.form.get('predictCount')
     if predictCount:
@@ -72,18 +72,18 @@ def mining(user, proj, rsrc):
         predictEnd = predictStart + predictCount
     else:
         predictEnd = None
-    
+
     algo = request.form.get('algo')
     label = request.form.get('label')
-    if label == None: label = ""
-    
+    if label is None: label = ""
+
     args = request.form.get('args')
     if args:
         args = json.parse(args)
         assert isinstance(args, dict)
     else:
         args = {}
-    
+
     context = {
         "user": user,
         "proj": proj,
@@ -97,7 +97,7 @@ def mining(user, proj, rsrc):
         "predictStart": predictStart,
         "predictEnd": predictEnd
     }
-    
+
     # 调用具体算法
     funcDict = {
         "kmeans": kmeans,
@@ -111,16 +111,16 @@ def mining(user, proj, rsrc):
     if not func:
         res.data = json.stringify({'succ': False, 'msg': 'Unknown algo!'})
         return res
-    
+
     res.data = func(context)
     return res
 
 def apriori(context):
     idList, dataList = getData(context)
-    
+
     from dm import apriori
     rawRes = apriori(dataList)
-    
+
     conn = config.getConn()
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'assoc')
@@ -135,7 +135,7 @@ def apriori(context):
         result.append((id, count, v))
         count += 1
     dbWriteBack(cursor, result)
-    
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -143,10 +143,10 @@ def apriori(context):
 
 def kmedoids(context):
     idList, dataList = getData(context)
-    
+
     from dm import kmedoids
     _, _, rawRes = kmedoids(dataList)
-    
+
     conn = config.getConn()
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'cluster')
@@ -156,9 +156,9 @@ def kmedoids(context):
         for i in rawRes[medoid]:
             result.append((id, idList[i], clusterId))
         clusterId += 1
-    
+
     dbWriteBack(cursor, result)
-    
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -166,20 +166,20 @@ def kmedoids(context):
 
 def kmeans(context):
     idList, dataList = getData(context)
-    
+
     from sklearn.cluster import KMeans
     clf = KMeans()
     clf.fit(dataList)
-    
+
     conn = config.getConn()
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'cluster')
     result = []
     for i in xrange(len(clf.labels_)):
         result.append((id, idList[i], clf.labels_[i]))
-    
+
     dbWriteBack(cursor, result)
-    
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -191,9 +191,9 @@ def classify(context):
         return json.stringify({'succ': False, 'msg': 'Label invalid!'})
 
     from sklearn.neighbors import KNeighborsClassifier
-    from sklearn.naive_bayes import MultinomialNB 
-    from sklearn.svm import SVC 
-    
+    from sklearn.naive_bayes import MultinomialNB
+    from sklearn.svm import SVC
+
     algo = context['algo']
     if algo == 'svm':
         classifier = SVC
@@ -203,24 +203,24 @@ def classify(context):
         classifier = MultinomialNB
     else:
         assert False
-    
+
     dataList, labelList, idList, predictList \
         = getDataWithLabel(context)
-    
+
     clf = classifier()
     clf.fit(dataList, labelList)
     rawRes = clf.predict(predictList)
-    
+
     conn = config.getConn()
     cursor = conn.cursor()
     id = dbAddHistory(cursor, context, 'classify')
-    
+
     result = []
     for i in xrange(len(rawRes)):
         result.append((id, idList[i], rawRes[i]))
-    
+
     dbWriteBack(cursor, result)
-    
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -228,15 +228,13 @@ def classify(context):
 
 
 def dbAddHistory(cursor, context, type):
-    sql = 'insert into history (userid, proj, rsrc, tp, tm) values (%s, %s, %s, %s, %s)'
-    ts = int(time.time())
-    cursor.execute(sql, (context['user'], context['proj'], context['rsrc'], 
-                         type, ts))
+    sql = 'insert into history (userid, proj, rsrc, tp, tm) values (%s, %s, %s, %s, null)'
+    cursor.execute(sql, (context['user'], context['proj'], context['rsrc'], type))
     return cursor.lastrowid
 
 def dbWriteBack(cursor, result):
     sql = "insert into result values (%s,%s,%s)"
-    cursor.executemany(sql, result) 
+    cursor.executemany(sql, result)
 
 def getDataFromSvr(user, proj, rsrc):
     url = config.rmp + '/Entity/' + \
@@ -253,7 +251,7 @@ def convertData(data, start = 0, end = None, cols = [], label = None):
     如有标签将其去除，
     最后将数组切片。
     """
-    
+
     idList = []
     dataList = []
     labelList = []
@@ -261,53 +259,53 @@ def convertData(data, start = 0, end = None, cols = [], label = None):
         elemId = elem['id']
         idList.append(elemId)
         del elem['id']
-        
+
         if(label):
             elemLabel = elem[label]
             labelList.append(elemLabel)
             del elem[label]
-        
+
         row = []
         for k, v in elem.items():
             if (v != None and v != "") and \
                (len(cols) == 0 or k in cols):
                 row.append(v)
         dataList.append(row)
-        
+
         elem['id'] = elemId
         if(label): elem[label] = elemLabel
-    
+
     return idList[start:end], \
         dataList[start:end], labelList[start:end]
 
 def getData(context):
     rawData = getDataFromSvr(context['user'], \
         context['proj'], context['rsrc'])
-        
+
     cols = context['cols']
     start = context['start']
     end = context['end']
     idList, dataList, _ = convertData(rawData, start, end, cols)
-    
+
     return idList, dataList
 
 def getDataWithLabel(context):
     rawData = getDataFromSvr(context['user'], \
         context['proj'], context['rsrc'])
-    
+
     cols = context['cols']
     start = context['start']
     end = context['end']
     predictStart = context['predictStart']
     predictEnd = context['predictEnd']
     label = context['label']
-    
+
     # 训练集
     _, dataList, labelList = convertData(rawData, start, end, cols, label)
-    
+
     # 测试集
     idList, predictList, _ = convertData(rawData, predictStart, predictEnd, cols, label)
-    
+
     return dataList, labelList, idList, predictList
 
 
@@ -336,19 +334,22 @@ def getResult():
     cur.execute(sql)
     result = []
     for row in cur.fetchall():
+        if row[5] is not None:
+            tm = str(row[5])
+        else: 
+            tm = row[5]
         obj = {
             "id": row[0],
             "uid": row[1],
             "proj": row[2],
             "rsrc": row[3],
             "type": row[4],
-            "time": row[5]
+            "time": tm
         }
         result.append(obj)
     cur.close()
     conn.close()
-    
+
     res = make_response(json.stringify({"succ": True, "data": result}))
     res.headers["Content-Type"] = "application/json"
     return res
-    
