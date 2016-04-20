@@ -327,7 +327,7 @@ def iris(user):
         id += 1
     return json.stringify({'iris': r})
 
-def getResult():
+def getHistory():
     conn = config.getConn()
     cur = conn.cursor()
     sql = "select id,userid,proj,rsrc,tp,tm from history"
@@ -352,4 +352,15 @@ def getResult():
 
     res = make_response(json.stringify({"succ": True, "data": result}))
     res.headers["Content-Type"] = "application/json"
+    return res
+
+def getResultById(id):
+    conn = config.getConn()
+    cur = conn.cursor()
+    sql = "select k,v from result where id=%s"
+    cur.execute(sql, (id,))
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    res = make_response(json.stringify({"succ": True, "data": result}))
     return res

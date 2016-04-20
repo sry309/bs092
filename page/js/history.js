@@ -4,7 +4,7 @@ $(function(){
     var getHistory = function() {
         $.ajax({
             type: "GET",
-            url: "result/",
+            url: "history/",
             dataType: "json"
         }).done(function(json) {
             if (!json.succ) 
