@@ -15,13 +15,48 @@ $(function() {
             if (!json.succ) 
                 alert(json.errmsg);
             else
-                loadResult(json.data);
+                getData(json.data);
         }).fail(function(data) {
             alert('Network error!');
         });
     };
     
-    var loadResult = function(list) {
+    var getData = function(result) {
+        
+        var rsrcName = rsrc.split('/')[2];
+        var url = getUrl() + '/Entity/' + rsrc + '/';
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json"
+        }).done(function(json) {
+            if (!json[rsrcName]) 
+                alert('Network error!');
+            else
+                loadResult(result, json[rsrcName]);
+        }).fail(function(data) {
+            alert('Network error!');
+        });
+    };
+    
+    var loadResult = function(result, data) {
+        
+        /*// deal with data
+        if(data.length == 0)
+            throw new Error();
+        
+        var keys = {}
+        for(var k in data[0]);
+            
+        
+        var dataMap = {}
+        for(var i = 0; i < data.length; i++)
+        {
+            var elem = data[i];
+            var id = elem.id;
+            delete elem.id;
+            dataMap[id] = elem;
+        }
         
         $('.result-row').remove();
         for (var i = 0; i < list.length; i++) {
@@ -35,7 +70,7 @@ $(function() {
             $tr.append($labelTd);
             $('#result-table').append($tr);
             
-        }
+        }*/
     };
     
     getResult();
