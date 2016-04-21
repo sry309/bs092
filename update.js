@@ -24,10 +24,14 @@ var getTimeStr = function() {
 var cmds = [
     'git add -A',
     'git commit -m "' + getTimeStr() + '"',
-    'git push',
+    'git push'
 ];
 
 for(var cmd of cmds) {
-    console.log(cmd);
-    console.log(process.execSync(cmd).toString());
+    try {
+        console.log(cmd);
+        console.log(process.execSync(cmd).toString());
+    } catch(ex) {
+        console.log(ex.toString());
+    }
 }
