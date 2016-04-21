@@ -29,8 +29,8 @@ $(function(){
             
             var $tr = $('<tr class="history-row"></tr>');
             var $idTd = $('<td class="history-id">' + elem.id + '</td>');
-            var $rsrcTd = $('<td><a href="' + url + '" target="_blank">' + rsrc + '</a></td>');
-            var $typeTd = $('<td>' + algoDict[elem.type] + '</td>');
+            var $rsrcTd = $('<td class="history-rsrc"><a href="' + url + '" target="_blank">' + rsrc + '</a></td>');
+            var $typeTd = $('<td class="history-type" data-type="' + elem.type + '">' + algoDict[elem.type] + '</td>');
             var $timeTd = $('<td>' + elem.time + '</td>');
             var $opTd = $('<td></td>');
             var $viewAnchor = $('<a href="#" class="view-result">查看</a>');
@@ -50,8 +50,12 @@ $(function(){
     var viewResult = function() {
         event.preventDefault();
         var id = $(this).parent().parent().children('.history-id').text();
+        var rsrc = $(this).parent().parent().children('.history-rsrc').text();
+        var type = $(this).parent().parent().children('.history-type').attr('data-type');
         localStorage.setItem('resultId', id);
-        location.href = 'result.html';
+        localStorage.setItem('resultRsrc', rsrc);
+        localStorage.setItem('resultType', type);
+        location.href = './result.html';
     }
     
     
