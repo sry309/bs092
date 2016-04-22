@@ -116,23 +116,26 @@ def mining(user, proj, rsrc):
     return res
 
 def apriori(context):
-    idList, dataList = getData(context)
+    rawData = getDataFromSvr(context['user'], \
+        context['proj'], context['rsrc'])
+    _, data = processData(rawData, context['start'], \
+        context['end'], context['cols'])
+    dataList = convertDataToArr(data)
 
     from dm import apriori
     rawRes = apriori(dataList)
 
     conn = config.getConn()
     cursor = conn.cursor()
-    id = dbAddHistory(cursor, context, 'assoc')
+    hid = dbAddHistory(cursor, context, 'assoc')
     result = []
     count = 0
     for row in rawRes:
-        v = "{0} -> {1} : {2}".format(
+        v = "{0} -> {1}".format(
             ', '.join(row[0]),
-            ', '.join(row[1]),
-            row[2]
+            ', '.join(row[1])
         )
-        result.append((id, count, v))
+        result.append((hid, count, row[2], v))
         count += 1
     dbWriteBack(cursor, result)
 
@@ -142,19 +145,24 @@ def apriori(context):
     return json.stringify({'succ': True, 'msg': 'Done...'})
 
 def kmedoids(context):
-    idList, dataList = getData(context)
+    rawData = getDataFromSvr(context['user'], \
+        context['proj'], context['rsrc'])
+    idList, data = processData(rawData, context['start'], \
+        context['end'], context['cols'])
+    dataList = convertDataToArr(data)
 
     from dm import kmedoids
     _, _, rawRes = kmedoids(dataList)
 
     conn = config.getConn()
     cursor = conn.cursor()
-    id = dbAddHistory(cursor, context, 'cluster')
+    hid = dbAddHistory(cursor, context, 'cluster')
     result = []
     clusterId = 0
     for medoid in rawRes.keys():
         for i in rawRes[medoid]:
-            result.append((id, idList[i], clusterId))
+            result.append((hid, idList[i], clusterId,
+                json.stringify(dataList[i])))
         clusterId += 1
 
     dbWriteBack(cursor, result)
@@ -165,7 +173,11 @@ def kmedoids(context):
     return json.stringify({'succ': True, 'msg': 'Done...'})
 
 def kmeans(context):
-    idList, dataList = getData(context)
+    rawData = getDataFromSvr(context['user'], \
+        context['proj'], context['rsrc'])
+    idList, data = processData(rawData, context['start'], \
+        context['end'], context['cols'])
+    dataList = convertDataToArr(data)
 
     from sklearn.cluster import KMeans
     clf = KMeans()
@@ -173,10 +185,11 @@ def kmeans(context):
 
     conn = config.getConn()
     cursor = conn.cursor()
-    id = dbAddHistory(cursor, context, 'cluster')
+    hid = dbAddHistory(cursor, context, 'cluster')
     result = []
     for i in xrange(len(clf.labels_)):
-        result.append((id, idList[i], clf.labels_[i]))
+        result.append((hid, idList[i], clf.labels_[i], 
+            json.stringify(data[i])))
 
     dbWriteBack(cursor, result)
 
@@ -187,6 +200,7 @@ def kmeans(context):
 
 def classify(context):
 
+    label = context['label']
     if not re.match(r'^\w+$', label):
         return json.stringify({'succ': False, 'msg': 'Label invalid!'})
 
@@ -204,11 +218,17 @@ def classify(context):
     else:
         assert False
 
-    dataList, labelList, idList, predictList \
-        = getDataWithLabel(context)
+    rawData = getDataFromSvr(context['user'], \
+        context['proj'], context['rsrc'])
+    labelList, train = getTrainingSet(rawData, label, context['start'], \
+        context['end'], context['cols'])
+    trainList = convertDataToArr(train)
+    idList, predict = getPredictSet(rawData, context['predictStart'], \
+        context['predictEnd'], context['cols'])
+    predictList = convertDataToArr(predict)
 
     clf = classifier()
-    clf.fit(dataList, labelList)
+    clf.fit(trainList, labelList)
     rawRes = clf.predict(predictList)
 
     conn = config.getConn()
@@ -217,7 +237,7 @@ def classify(context):
 
     result = []
     for i in xrange(len(rawRes)):
-        result.append((id, idList[i], rawRes[i]))
+        result.append((id, idList[i], rawRes[i], json.stringify(predict[i])))
 
     dbWriteBack(cursor, result)
 
@@ -233,7 +253,7 @@ def dbAddHistory(cursor, context, type):
     return cursor.lastrowid
 
 def dbWriteBack(cursor, result):
-    sql = "insert into result values (%s,%s,%s)"
+    sql = "insert into result values (%s,%s,%s,%s)"
     cursor.executemany(sql, result)
 
 def getDataFromSvr(user, proj, rsrc):
@@ -277,6 +297,39 @@ def convertData(data, start = 0, end = None, cols = [], label = None):
 
     return idList[start:end], \
         dataList[start:end], labelList[start:end]
+
+def processData(rawData, start = 0, end = None, cols = []):
+    data = rawData[start:end]
+    idList = []
+    for elem in data:
+        idList.append(elem['id'])
+        del elem['id']
+        for k, v in elem.items():
+            if len(cols) != 0 and k not in cols:
+                del elem[k]
+    return idList, data
+
+getPredictSet = processData
+
+def getTrainingSet(rawData, label, start = 0, end = None, cols = []):
+    data = rawData[start:end]
+    labelList = []
+    for elem in data:
+        del elem['id']
+        labelList.append(elem[label])
+        for k, v in elem.items():
+            if len(cols) != 0 and k not in cols:
+                del elem[k]
+    return labelList, data
+
+def convertDataToArr(data):
+    dataList = []
+    for elem in data:
+        row = []
+        for v in elem.values():
+            row.append(v)
+        dataList.append(row)
+    return dataList
 
 def getData(context):
     rawData = getDataFromSvr(context['user'], \
@@ -357,7 +410,7 @@ def getHistory():
 def getResultById(id):
     conn = config.getConn()
     cur = conn.cursor()
-    sql = "select k,v from result where id=%s"
+    sql = "select id,res1,res2 from result where hid=%s"
     cur.execute(sql, (id,))
     result = cur.fetchall()
     cur.close()

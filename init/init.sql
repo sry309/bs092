@@ -10,9 +10,10 @@ create table history
 
 create table result
 (
-    id int,
-    k varchar(32),
-    v varchar(64),
-    primary key(id, k),
-    foreign key(id) references history(id)
+    hid int,
+    id varchar(32),
+    res1 varchar(128),
+    res2 varchar(256),
+    primary key(hid, id),
+    foreign key(hid) references history(id)
 ) DEFAULT CHARSET=utf8
