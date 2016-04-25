@@ -55,8 +55,11 @@ $(function() {
             }
             else if(type == 'cluster' || type == 'classify')
             {
+                var dataStr = htmlSpecialChars(formatData(JSON.parse(elem[2])));
+                //var $idTd = $('<td><span data-toggle="tooltip" data-placement="right" title="' + 
+                //    dataStr + '">' + elem[0] + '</span></td>');
                 var $idTd = $('<td>' + elem[0] + '</td>');
-                var $dataTd = $('<td>' + elem[2] + '</td>');
+                var $dataTd = $('<td>' + dataStr + '</td>');
                 var $labelTd = $('<td>' + elem[1] + '</td>');
                 $tr.append($idTd);
                 $tr.append($dataTd);
@@ -67,6 +70,14 @@ $(function() {
 
             $('#result-table').append($tr);
         }
+        //$('[data-toggle="tooltip"]').tooltip()
+    };
+    
+    var formatData = function(data) {
+        var arr = [];
+        for(var k in data)
+            arr.push(k + ': ' + data[k]);
+        return arr.join(', ');
     };
     
     getResult();

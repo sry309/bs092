@@ -22,6 +22,14 @@ function setUser(id, un, pw) {
     localStorage.setItem('pw', pw);
 }
 
+function htmlSpecialChars(s) {
+    return s.replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
+
 var statusMap = {
     1: 'View Resouce',
     2: 'Manage Resource',
