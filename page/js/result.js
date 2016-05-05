@@ -1,3 +1,7 @@
+var data = null;
+var curPage = 1;
+var totalPage = 0;
+
 $(function() {
     
     var id = localStorage.getItem('resultId');
@@ -19,7 +23,6 @@ $(function() {
     }
     else
         throw new Error();
-
     
     var getResult = function() {
         $.ajax({
@@ -29,8 +32,12 @@ $(function() {
         }).done(function(json) {
             if (!json.succ) 
                 alert(json.errmsg);
-            else
-                loadResult(json.data);
+            else {
+                data = json.data;
+                totalPage = Math.floor((data.length - 1) / pageCap) + 1;
+                loadPagBar(1, totalPage);
+                loadResult(data.slice(0, pageCap));
+            }
         }).fail(function(data) {
             alert('Network error!');
         });
@@ -72,6 +79,7 @@ $(function() {
         }
         //$('[data-toggle="tooltip"]').tooltip()
     };
+    window.loadResult = loadResult;
     
     var formatData = function(data) {
         var arr = [];
