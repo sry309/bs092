@@ -57,7 +57,7 @@ var algoDict = {
 
 var $getPagBtn = function(data, text) {
     return $('<button data-pg="' + data + 
-        '" type="button" class="btn btn-default pag-btn">' + 
+        '" type="button" class="btn btn-primary pag-btn">' + 
         text +'</button>');
 }
 
@@ -77,25 +77,34 @@ var loadPagBar = function(cur, total) {
     pages = pages.filter(function(x){return x > 0 && x <= total;});
     
     var result = [];
-    if(cur != 1)
-        result.push($getPagBtn(cur - 1, '上一页'));
+    if(cur != 1) {
+        var $prev = $getPagBtn(cur - 1, '上一页');
+        $prev.addClass('pag-prev');
+        result.push($prev);
+    }
     
+    
+    var $nums = $('<div class="btn-group pag-num" role="group"></div>');
+    result.push($nums);
     if(pages.indexOf(1) == -1) {
-        result.push($getPagBtn(1, 1));
-        result.push($getPagBtn('', '...'));
+        $getPagBtn(1, 1).appendTo($nums);
+        $getPagBtn('', '...').appendTo($nums);
     }
     
     for(var i in pages) {
-        result.push($getPagBtn(pages[i], pages[i]));
+        $getPagBtn(pages[i], pages[i]).appendTo($nums);
     }
     
     if(pages.indexOf(total) == -1) {
-        result.push($getPagBtn('', '...'));
-        result.push($getPagBtn(total, total));
+        $getPagBtn('', '...').appendTo($nums);
+        $getPagBtn(total, total).appendTo($nums);
     }
     
-    if(cur != total && total != 1)
-        result.push($getPagBtn(cur + 1, '下一页'));
+    if(cur != total && total != 1) {
+        var $next = $getPagBtn(cur + 1, '下一页');
+        $next.addClass('pag-next');
+        result.push($next);
+    }
     
     for(var i = 0; i < result.length; i++)
         $('#pag-bar').append(result[i]);

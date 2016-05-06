@@ -12,3 +12,20 @@
   padding-top: 5px;
   padding-bottom: 5px;
 }
+
+.pag-num {
+    margin: 0 auto;
+    float: center;
+}
+
+.pag-next {
+    float: right;
+}
+
+.pag-prev {
+    float: left;
+}
+
+#pag-bar {
+    text-align: center;
+}
