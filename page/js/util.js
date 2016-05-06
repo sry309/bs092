@@ -94,7 +94,7 @@ var loadPagBar = function(cur, total) {
         result.push($getPagBtn(total, total));
     }
     
-    if(cur != total)
+    if(cur != total && total != 1)
         result.push($getPagBtn(cur + 1, '下一页'));
     
     for(var i = 0; i < result.length; i++)
