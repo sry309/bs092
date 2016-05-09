@@ -63,7 +63,7 @@ var $getPagBtn = function(data, text) {
 
 var pageCap = 10;
 
-var loadPagBar = function(cur, total) {
+var loadPagBar = function(cur, total, data) {
     if(cur > total) throw new Error();
     
     $('#pag-bar').empty();
@@ -108,13 +108,43 @@ var loadPagBar = function(cur, total) {
     
     for(var i = 0; i < result.length; i++)
         $('#pag-bar').append(result[i]);
-    $('.pag-btn').click(refreshPage);
+    $('.pag-btn').click(function(){refreshPage.call(this, total, data)});
 };
 
-var refreshPage = function() {
+var refreshPage = function(total, data) {
     var pg = $(this).data('pg');
     if(pg == '') return;
-    curPage = pg;
-    loadPagBar(curPage, totalPage);
-    loadResult(data.slice((curPage - 1) * pageCap, curPage * pageCap));
+    loadPagBar(pg, total, data);
+    loadResult(data.slice((pg - 1) * pageCap, pg * pageCap));
 };
+
+var keys = function(o) {
+    var keys = [];
+    for(var k in o)
+        keys.push(k);
+    return keys;
+};
+
+var labelToColor = function(i) {
+    var m = [
+        "AliceBlue", "AntiqueWhite", "Aqua", "Aquamarine", "Azure", "Beige", "Bisque", "Black", "BlanchedAlmond", 
+        "Blue", "BlueViolet", "Brown", "BurlyWood", "CadetBlue", "Chartreuse", "Chocolate", "Coral", "CornflowerBlue", 
+        "Cornsilk", "Crimson", "Cyan", "DarkBlue", "DarkCyan", "DarkGoldenRod", "DarkGray", "DarkGreen", "DarkKhaki", 
+        "DarkMagenta", "DarkOliveGreen", "Darkorange", "DarkOrchid", "DarkRed", "DarkSalmon", "DarkSeaGreen", 
+        "DarkSlateBlue", "DarkSlateGray", "DarkTurquoise", "DarkViolet", "DeepPink", "DeepSkyBlue", "DimGray", 
+        "DodgerBlue", "Feldspar", "FireBrick", "FloralWhite", "ForestGreen", "Fuchsia", "Gainsboro", "GhostWhite", 
+        "Gold", "GoldenRod", "Gray", "Green", "GreenYellow", "HoneyDew", "HotPink", "IndianRed", "Indigo", "Ivory", 
+        "Khaki", "Lavender", "LavenderBlush", "LawnGreen", "LemonChiffon", "LightBlue", "LightCoral", "LightCyan", 
+        "LightGoldenRodYellow", "LightGrey", "LightGreen", "LightPink", "LightSalmon", "LightSeaGreen", "LightSkyBlue", 
+        "LightSlateBlue", "LightSlateGray", "LightSteelBlue", "LightYellow", "Lime", "LimeGreen", "Linen", "Magenta", "Maroon", 
+        "MediumAquaMarine", "MediumBlue", "MediumOrchid", "MediumPurple", "MediumSeaGreen", "MediumSlateBlue", "MediumSpringGreen", 
+        "MediumTurquoise", "MediumVioletRed", "MidnightBlue", "MintCream", "MistyRose", "Moccasin", "NavajoWhite", "Navy", 
+        "OldLace", "Olive", "OliveDrab", "Orange", "OrangeRed", "Orchid", "PaleGoldenRod", "PaleGreen", "PaleTurquoise", 
+        "PaleVioletRed", "PapayaWhip", "PeachPuff", "Peru", "Pink", "Plum", "PowderBlue", "Purple", "Red", "RosyBrown", 
+        "RoyalBlue", "SaddleBrown", "Salmon", "SandyBrown", "SeaGreen", "SeaShell", "Sienna", "Silver", "SkyBlue", "SlateBlue", 
+        "SlateGray", "Snow", "SpringGreen", "SteelBlue", "Tan", "Teal", "Thistle", "Tomato", "Turquoise", "Violet", "VioletRed", 
+        "Wheat", "White", "WhiteSmoke", "Yellow", "YellowGreen"
+    ];
+    
+    return m[i % m.length];
+}
