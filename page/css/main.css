@@ -29,7 +29,10 @@
     text-align: center;
     border: 1px solid #245580;
     border-radius: 4px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     background-image: linear-gradient(to bottom,#337ab7 0,#265a88 100%);
+    padding: 0;
 }
 
 #pag-bar .btn {

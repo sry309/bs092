@@ -5,6 +5,7 @@
   <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
   <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap-theme.min.css" rel="stylesheet" />
   <script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="./js/util.js"></script>
   <script src="./js/checknotlogin.js"></script>
   <script src="./js/result.js"></script>
@@ -38,9 +39,16 @@
             <tr id="result-head">
             </tr>
         </table>
+        <div id="pag-bar" class="panel-body"></div>
     </div>
     
-    <div id="pag-bar"></div>
+    
+    
+    <div class="panel panel-primary">
+        <div class="panel-body" style="text-align:center">
+            <svg id="total-svg"></svg>
+        </div>
+    </div>
 </div>
 </body>
 </html>

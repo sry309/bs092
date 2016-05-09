@@ -37,6 +37,7 @@ $(function() {
                 totalPage = Math.floor((data.length - 1) / pageCap) + 1;
                 loadPagBar(1, totalPage);
                 loadResult(data.slice(0, pageCap));
+                loadCharts(data);
             }
         }).fail(function(data) {
             alert('Network error!');
@@ -86,6 +87,48 @@ $(function() {
         for(var k in data)
             arr.push(k + ': ' + data[k]);
         return arr.join(', ');
+    };
+    
+    var loadCharts = function(list) {
+        if(type != 'cluster' && type != 'classify')
+            return;
+        
+        var arr = [];
+        for (var i = 0; i < list.length; i++) {
+            var elem = list[i];
+            var label = elem[1];
+            var num = arr[label] || 0;
+            arr[label] = num + 1;
+        }
+        
+        var svg = d3.select("#total-svg")
+            .attr('width', 400).attr('height', 400);
+        var width = svg.attr("width");
+        var height = svg.attr("height");
+        var xScale = d3.scale.ordinal()
+            .domain(d3.range(arr.length))
+            .rangeRoundBands([0, width]);
+        var yScale = d3.scale.linear()
+            .domain([0,d3.max(arr)])
+            .range([height, 0]);
+        var rectPadding = 4;
+        var rects = svg.selectAll("rect")
+            .data(arr)
+            .enter()
+            .append("rect")
+            //.attr("class", "MyRect")
+            //.attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            } )
+            .attr("y",function(d){
+                return yScale(d);
+            })
+            .attr("width", xScale.rangeBand() - rectPadding )
+            .attr("height", function(d){
+                return height - yScale(d);
+            })
+            .style("fill", "#337ab7");
     };
     
     getResult();
