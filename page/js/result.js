@@ -104,7 +104,7 @@ $(function() {
         var svg = d3.select("#total-svg")
             .attr('width', 400).attr('height', 400);
         var width = svg.attr("width");
-        var height = svg.attr("height");
+        var height = svg.attr("height") - 20;
         var xScale = d3.scale.ordinal()
             .domain(d3.range(arr.length))
             .rangeRoundBands([0, width]);
@@ -112,7 +112,7 @@ $(function() {
             .domain([0,d3.max(arr)])
             .range([height, 0]);
         var rectPadding = 4;
-        var rects = svg.selectAll("rect")
+        var rects = svg.selectAll(".rect")
             .data(arr)
             .enter()
             .append("rect")
@@ -129,6 +129,49 @@ $(function() {
                 return height - yScale(d);
             })
             .style("fill", "#337ab7");
+            
+        var texts = svg.selectAll(".text")
+            .data(arr)
+            .enter()
+            .append("text")
+            //.attr("class","MyText")
+            //.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            } )
+            .attr("y",function(d){
+                return yScale(d);
+            })
+            .attr("dx",function(){
+                return (xScale.rangeBand() - rectPadding)/2 - 10;
+            })
+            .attr("dy", 20)
+            .text(function(d){
+                return d;
+            })
+            .style('fill', 'white');
+            
+        xAxis = [];
+        for(var i in arr)
+            xAxis.push(i);
+        var texts = svg.selectAll(".label")
+            .data(xAxis)
+            .enter()
+            .append("text")
+            //.attr("class","MyText")
+            //.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            } )
+            .attr("y", height)
+            .attr("dx",function(){
+                return (xScale.rangeBand() - rectPadding)/2 - 5;
+            })
+            .attr("dy", 20)
+            .text(function(d){
+                return d;
+            })
+            .style('fill', 'black');
     };
     
     getResult();
