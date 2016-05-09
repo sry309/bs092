@@ -37,7 +37,7 @@ $(function() {
                 totalPage = Math.floor((data.length - 1) / pageCap) + 1;
                 loadPagBar(1, totalPage);
                 loadResult(data.slice(0, pageCap));
-                loadCharts(data);
+                loadTotalChart(data);
             }
         }).fail(function(data) {
             alert('Network error!');
@@ -89,7 +89,7 @@ $(function() {
         return arr.join(', ');
     };
     
-    var loadCharts = function(list) {
+    var loadTotalChart = function(list) {
         if(type != 'cluster' && type != 'classify')
             return;
         
