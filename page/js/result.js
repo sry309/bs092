@@ -94,27 +94,29 @@ $(function() {
         
         $('#total-svg').empty();
         
-        var arr = [];
+        var labelCountMap = {};
         for (var i = 0; i < list.length; i++) {
             var elem = list[i];
             var label = elem[1];
-            var num = arr[label] || 0;
-            arr[label] = num + 1;
+            var num = labelCountMap[label] || 0;
+            labelCountMap[label] = num + 1;
         }
+        var labels = keys(labelCountMap);
+        var counts = values(labelCountMap);
         
         var svg = d3.select("#total-svg")
             .attr('width', 400).attr('height', 400);
         var width = svg.attr("width");
         var height = svg.attr("height") - 20;
         var xScale = d3.scale.ordinal()
-            .domain(d3.range(arr.length))
+            .domain(d3.range(counts.length))
             .rangeRoundBands([0, width]);
         var yScale = d3.scale.linear()
-            .domain([0,d3.max(arr)])
+            .domain([0,d3.max(counts)])
             .range([height, 0]);
         var rectPadding = 4;
         var rects = svg.selectAll(".rect")
-            .data(arr)
+            .data(counts)
             .enter()
             .append("rect")
             //.attr("class", "MyRect")
@@ -130,11 +132,11 @@ $(function() {
                 return height - yScale(d);
             })
             .attr("fill", function(d, i) {
-                return labelToColor(i);
+                return labelToColor(labels[i]);
             });
             
         var texts = svg.selectAll(".text")
-            .data(arr)
+            .data(counts)
             .enter()
             .append("text")
             //.attr("class","MyText")
@@ -152,11 +154,10 @@ $(function() {
             .text(function(d){
                 return d;
             })
-            .style('fill', 'white');
+            .attr('fill', 'white');
             
-        var xAxis = keys(arr);
         var texts = svg.selectAll(".label")
-            .data(xAxis)
+            .data(labels)
             .enter()
             .append("text")
             //.attr("class","MyText")
@@ -172,7 +173,7 @@ $(function() {
             .text(function(d){
                 return d;
             })
-            .style('fill', 'black');
+            .attr('fill', 'black');
     };
     
     var loadDistChart = function(data, cols) {

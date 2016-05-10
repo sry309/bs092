@@ -125,9 +125,16 @@ var keys = function(o) {
     return keys;
 };
 
+var values = function(o) {
+    var values = [];
+    for(var k in o)
+        values.push(o[k]);
+    return values;
+}
+
 var labelToColor = function(i) {
     var m = [
-        "#993", "#FFC", "#C9C", "#C96", "#666", "#C99", "#CC9", "#333", "#96C"
+        "#993", "#C9C", "#C96", "#666", "#C99", "#CC9", "#333", "#96C"
     ];
     
     return m[i % m.length];
