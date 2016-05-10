@@ -92,6 +92,8 @@ $(function() {
         if(type != 'cluster' && type != 'classify')
             return;
         
+        $('#total-svg').empty();
+        
         var arr = [];
         for (var i = 0; i < list.length; i++) {
             var elem = list[i];
@@ -177,17 +179,19 @@ $(function() {
         if(type != 'cluster' && type != 'classify')
             return;
         
+        $('#dist-svg').empty();
+        
         var xCol = cols[0];
         if(!xCol) throw new Error();
         var yCol = cols[1] || cols[0];
         var xArr = data.map(function(e){return e[2][xCol];})
         var yArr = data.map(function(e){return e[2][yCol];})
         
-        var padding = 30;
+        var padding = {left: 30, right: 10, top: 10, bottom: 20};
         var svg = d3.select("#dist-svg")
             .attr('width', 400).attr('height', 400);
-        var width = svg.attr("width") - 2 * padding;
-        var height = svg.attr("height") - 2 * padding;
+        var width = svg.attr("width") - padding.left - padding.right;
+        var height = svg.attr("height") - padding.top - padding.bottom;
         var xScale = d3.scale.linear()
             .domain([0, d3.max(xArr)])
             .range([0, width]);
@@ -207,7 +211,7 @@ $(function() {
                 return yScale(d[2][yCol]);
             })
             .attr('r', 3)
-            .attr("transform","translate(" + padding + "," + padding + ")")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
             .attr('fill', function(d) {
                 return labelToColor(d[1]);
             });
@@ -217,7 +221,7 @@ $(function() {
             .orient("left");
         svg.append("g")
             .attr("class","axis")
-            .attr("transform","translate(" + padding + "," + padding + ")")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
             .call(yAxis);
             
         var xAxis = d3.svg.axis()
@@ -225,7 +229,7 @@ $(function() {
             .orient("bottom");
         svg.append("g")
             .attr("class","axis")
-            .attr("transform","translate(" + padding + "," + (height + padding) + ")")
+            .attr("transform","translate(" + padding.left + "," + (height + padding.top) + ")")
             .call(xAxis); 
     };
     
