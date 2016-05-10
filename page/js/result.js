@@ -127,8 +127,8 @@ $(function() {
             .attr("height", function(d){
                 return height - yScale(d);
             })
-            .style("fill", function(d) {
-                return labelToColor(d);
+            .attr("fill", function(d, i) {
+                return labelToColor(i);
             });
             
         var texts = svg.selectAll(".text")
@@ -183,17 +183,17 @@ $(function() {
         var xArr = data.map(function(e){return e[2][xCol];})
         var yArr = data.map(function(e){return e[2][yCol];})
         
-        var padding = 20;
+        var padding = 30;
         var svg = d3.select("#dist-svg")
             .attr('width', 400).attr('height', 400);
-        var width = svg.attr("width") - padding;
-        var height = svg.attr("height") - padding;
+        var width = svg.attr("width") - 2 * padding;
+        var height = svg.attr("height") - 2 * padding;
         var xScale = d3.scale.linear()
             .domain([0, d3.max(xArr)])
             .range([0, width]);
         var yScale = d3.scale.linear()
             .domain([0, d3.max(yArr)])
-            .range([0, height]);
+            .range([height, 0]);
         
         var circles = svg.selectAll('.circle')
             .data(data)
@@ -204,12 +204,29 @@ $(function() {
                 console.log(d);
             })
             .attr('cy', function(d) {
-                return width - yScale(d[2][yCol]);
+                return yScale(d[2][yCol]);
             })
-            .attr('r', 4)
-            .style('fill', function(d) {
+            .attr('r', 3)
+            .attr("transform","translate(" + padding + "," + padding + ")")
+            .attr('fill', function(d) {
                 return labelToColor(d[1]);
             });
+        
+        var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left");
+        svg.append("g")
+            .attr("class","axis")
+            .attr("transform","translate(" + padding + "," + padding + ")")
+            .call(yAxis);
+            
+        var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom");
+        svg.append("g")
+            .attr("class","axis")
+            .attr("transform","translate(" + padding + "," + (height + padding) + ")")
+            .call(xAxis); 
     };
     
     getResult();
