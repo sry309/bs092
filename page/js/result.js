@@ -30,7 +30,10 @@ $(function() {
                 alert(json.errmsg);
             else {
                 var data = json.data;
-                data = data.map(function(e){return [e[0], e[1], JSON.parse(e[2])]});
+                if(type == 'assoc')
+                    data = data.map(function(e){return [e[0], e[1], e[2]]});
+                else
+                    data = data.map(function(e){return [e[0], e[1], JSON.parse(e[2])]});
                 //window.data = data;
                 var totalPage = Math.floor((data.length - 1) / pageCap) + 1;
                 loadPagBar(1, totalPage, data);
@@ -89,8 +92,10 @@ $(function() {
     };
     
     var loadTotalChart = function(list) {
-        if(type != 'cluster' && type != 'classify')
+        if(type != 'cluster' && type != 'classify') {
+            $('.visual-panel').addClass('hidden');
             return;
+        }
         
         $('#total-svg').empty();
         
@@ -177,8 +182,10 @@ $(function() {
     };
     
     var loadDistChart = function(data, cols) {
-        if(type != 'cluster' && type != 'classify')
+        if(type != 'cluster' && type != 'classify') {
+            //$('.visual-panel').addClass('hidden');
             return;
+        }
         
         $('#dist-svg').empty();
         
