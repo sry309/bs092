@@ -97,7 +97,9 @@ $(function() {
         
         var $keyOptions = keyList.map(function(k){return $('<option value="' + k + '">' + k + '</option>');});
         $('#col1-combo').append($keyOptions);
+        $keyOptions = keyList.map(function(k){return $('<option value="' + k + '">' + k + '</option>');});
         $('#col2-combo').append($keyOptions);
+        $('#gen-btn').click(function(){genDistChart(list);});
     };
     
     var loadTotalChart = function(list) {
@@ -188,6 +190,13 @@ $(function() {
                 return d;
             })
             .attr('fill', 'black');
+    };
+    
+    var genDistChart = function(data) {
+        var col1 = $('#col1-combo').val();
+        var col2 = $('#col2-combo').val();
+        if(!col1 || !col2) return;
+        loadDistChart(data, [col1, col2]);
     };
     
     var loadDistChart = function(data, cols) {
