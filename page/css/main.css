@@ -50,3 +50,9 @@
     font-family: sans-serif;
     font-size: 11px;
 }
+
+.form-label {
+    height: 34px;
+    padding: 6px 12px;
+    margin: 0;
+}
