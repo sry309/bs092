@@ -30,16 +30,13 @@ $(function() {
                 alert(json.errmsg);
             else {
                 var data = json.data;
-                if(type == 'assoc')
-                    data = data.map(function(e){return [e[0], e[1], e[2]]});
-                else
+                if(type != 'assoc')
                     data = data.map(function(e){return [e[0], e[1], JSON.parse(e[2])]});
                 //window.data = data;
                 var totalPage = Math.floor((data.length - 1) / pageCap) + 1;
                 loadPagBar(1, totalPage, data);
                 loadResult(data.slice(0, pageCap));
-                loadTotalChart(data);
-                loadDistChart(data, keys(data[0][2]).slice(0, 2));
+                loadCharts(data);
             }
         }).fail(function(data) {
             alert('Network error!');
@@ -89,6 +86,18 @@ $(function() {
         for(var k in data)
             arr.push(k + ': ' + data[k]);
         return arr.join(', ');
+    };
+    
+    var loadCharts = function(list) {
+        
+        var keyList = keys(list[0][2]);
+        
+        loadTotalChart(list);
+        loadDistChart(list, keyList.slice(0, 2));
+        
+        var $keyOptions = keyList.map(function(k){return $('<option value="' + k + '">' + k + '</option>');});
+        $('#col1-combo').append($keyOptions);
+        $('#col2-combo').append($keyOptions);
     };
     
     var loadTotalChart = function(list) {
