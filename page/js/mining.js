@@ -128,8 +128,10 @@ $(function(){
         }).done(function(data){
            if(!data.succ)
                alert(data.msg);
-           else
+           else {
                alert('已提交。');
+               location.href = './history.html';
+           }
         }).fail(function(data, status, e){
             alert("network error");
         });

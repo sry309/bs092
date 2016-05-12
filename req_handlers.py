@@ -5,6 +5,7 @@ import re
 import config
 import urllib2
 import time
+from threading import Thread
 
 import sys
 reload(sys)
@@ -112,7 +113,9 @@ def mining(user, proj, rsrc):
         res.data = json.stringify({'succ': False, 'msg': 'Unknown algo!'})
         return res
 
-    res.data = func(context)
+    Thread(target=func, args=(context,)).start();
+    
+    res.data = json.stringify({'succ': True, 'msg': 'Done...'})
     return res
 
 def apriori(context):

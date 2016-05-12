@@ -59,7 +59,7 @@ var $getPagBtn = function(data, text) {
     return $('<button data-pg="' + data + 
         '" type="button" class="btn btn-primary pag-btn">' + 
         text +'</button>');
-}
+};
 
 var pageCap = 10;
 
@@ -130,7 +130,7 @@ var values = function(o) {
     for(var k in o)
         values.push(o[k]);
     return values;
-}
+};
 
 var labelToColor = function(i) {
     var m = [
@@ -138,4 +138,9 @@ var labelToColor = function(i) {
     ];
     
     return m[i % m.length];
+};
+
+function sleep(milliSeconds) { 
+    var startTime = new Date().getTime(); 
+    while (new Date().getTime() < startTime + milliSeconds);
 }
