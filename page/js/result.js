@@ -257,6 +257,39 @@ $(function() {
             .attr("class","axis")
             .attr("transform","translate(" + padding.left + "," + (height + padding.top) + ")")
             .call(xAxis); 
+            
+        // 绘制凸包
+        var pointsByLabel = {};
+        for (var i = 0; i < data.length; i++) {
+            var elem = data[i];
+            var label = elem[1];
+            var arr = pointsByLabel[label] || [];
+            var p = {x: elem[2][xCol], y: elem[2][yCol]};
+            arr.push(p);
+            pointsByLabel[label] = arr;
+        }
+        
+        for (var label in pointsByLabel) {
+            console.log('label: ' + label);
+            console.log('points: ' + JSON.stringify(pointsByLabel[label]));
+            var convex = graham(pointsByLabel[label]);
+            var linesData = [];
+            for(var i = 0; i < convex.length - 1; i++)
+                linesData.push([convex[i], convex[i + 1]]);
+            linesData.push([convex[convex.length - 1], convex[0]]);
+            console.log('lines: ' + JSON.stringify(linesData));
+            
+            var lines = svg.selectAll('.line')
+                .data(linesData)
+                .enter()
+                .append('line')
+                .attr('x1', function(d) {return xScale(d[0].x);})
+                .attr('y1', function(d) {return yScale(d[0].y);})
+                .attr('x2', function(d) {return xScale(d[1].x);})
+                .attr('y2', function(d) {return yScale(d[1].y);})
+                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                .attr('stroke', labelToColor(label));
+        }
     };
     
     getResult();

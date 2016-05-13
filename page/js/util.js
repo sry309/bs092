@@ -148,9 +148,13 @@ function sleep(milliSeconds) {
 
 // 两点连线与x轴的夹角，如果两点相同返回0
 function slopeAngle(p1, p2) {
-    var angle = Math.atan2(p1.y - p2.y, p1.x - p2.x);
-    if(angle < 0) angle += Math.PI / 2;
+    var angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
     return angle;
+}
+
+
+function distance(p1, p2) {
+    return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 }
 
 // 返回最下面的点，如果y值相同则返回左边的点
@@ -168,12 +172,18 @@ function findMostLeftBottom(arr) {
 // Graham扫描算法
 function graham(arr) {
     
+    arr = arr.slice();
     var lbMost = findMostLeftBottom(arr);
     var pos = arr.indexOf(lbMost);
     arr.splice(pos, 1);
     
     arr.sort(function(p1, p2) {
-        return slopeAngle(p1, lbMost) - slopeAngle(p2, lbMost);
+        var theta1 = slopeAngle(lbMost, p1);
+        var theta2 = slopeAngle(lbMost, p2);
+        if(theta1 != theta2)
+            return theta1 - theta2;
+        else
+            return distance(p1, lbMost) - distance(p2, lbMost);
     })
     
     var res = [lbMost];
@@ -195,6 +205,5 @@ function graham(arr) {
             }
         }
     }
-    arr.splice(pos, 0, lbMost);
     return res;
 }
