@@ -140,7 +140,61 @@ var labelToColor = function(i) {
     return m[i % m.length];
 };
 
+// 阻塞延迟
 function sleep(milliSeconds) { 
     var startTime = new Date().getTime(); 
     while (new Date().getTime() < startTime + milliSeconds);
+}
+
+// 两点连线与x轴的夹角，如果两点相同返回0
+function slopeAngle(p1, p2) {
+    var angle = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+    if(angle < 0) angle += Math.PI / 2;
+    return angle;
+}
+
+// 返回最下面的点，如果y值相同则返回左边的点
+function findMostLeftBottom(arr) {
+    if(arr.length == 0) throw new Error();
+    var res = arr[0];
+    for(var i = 1; i < arr.length; i++) {
+        var p = arr[i];
+        if(p.y < res.y || (p.y == res.y && p.x < res.x))
+            res = p;
+    }
+    return res;
+}
+
+// Graham扫描算法
+function graham(arr) {
+    
+    var lbMost = findMostLeftBottom(arr);
+    var pos = arr.indexOf(lbMost);
+    arr.splice(pos, 1);
+    
+    arr.sort(function(p1, p2) {
+        return slopeAngle(p1, lbMost) - slopeAngle(p2, lbMost);
+    })
+    
+    var res = [lbMost];
+    for(var i = 0; i < arr.length; i++) {
+        var p = arr[i];
+        if(res.length < 3) 
+            res.push(p);
+        else {
+            var p1 = res[res.length - 2],
+                p2 = res[res.length - 1];
+            var theta1 = slopeAngle(p1, p2),
+                theta2 = slopeAngle(p2, p);
+            if(theta1 < theta2) // 左转保留
+                res.push(p);
+            else // 右转舍弃
+            {
+                res.pop();
+                i--;
+            }
+        }
+    }
+    arr.splice(pos, 0, lbMost);
+    return res;
 }
