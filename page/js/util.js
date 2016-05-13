@@ -149,6 +149,7 @@ function sleep(milliSeconds) {
 // 两点连线与x轴的夹角，如果两点相同返回0
 function slopeAngle(p1, p2) {
     var angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    if (angle < 0) angle += Math.PI * 2;
     return angle;
 }
 
