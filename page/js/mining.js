@@ -78,7 +78,7 @@ $(function(){
     
     var mining = function() {
         
-        var user = getUser();
+        var uid = localStorage['id'];
         var proj = localStorage.getItem('proj');
         var token = localStorage.getItem('token');
         var rsrc = localStorage.getItem('rsrc');
@@ -110,7 +110,7 @@ $(function(){
         }
         cols = JSON.stringify(cols);
         
-        var url = './mining/' + token + '/' + proj + '/' + rsrc + '/';
+        var url = './mining/' + uid + '/' + token + '/' + proj + '/' + rsrc + '/';
         var data = 'algo=' + algo + '&start=' + start + "&count=" + 
             count + '&cols=' + cols;
         if(type == "classify")

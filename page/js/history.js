@@ -1,10 +1,11 @@
 $(function(){
     
+    var uid = localStorage['id'];
     
     var getHistory = function() {
         $.ajax({
             type: "GET",
-            url: "history/",
+            url: "history/" + uid + '/',
             dataType: "json"
         }).done(function(json) {
             if (!json.succ) 
@@ -24,12 +25,11 @@ $(function(){
         for(var i = 0; i < list.length; i++)
         {
             var elem = list[i];
-            var rsrc = elem.uid + '/' + elem.proj + '/' + elem.rsrc;
-            var url = getUrl() + '/Entity/' + rsrc + '/';
+            var url = getUrl() + '/Entity/' + elem.rsrc + '/';
             
             var $tr = $('<tr class="history-row"></tr>');
             var $idTd = $('<td class="history-id">' + elem.id + '</td>');
-            var $rsrcTd = $('<td class="history-rsrc"><a href="' + url + '" target="_blank">' + rsrc + '</a></td>');
+            var $rsrcTd = $('<td class="history-rsrc"><a href="' + url + '" target="_blank">' + elem.rsrc + '</a></td>');
             var $typeTd = $('<td class="history-type" data-type="' + elem.type + '">' + algoDict[elem.type] + '</td>');
             var $timeTd = $('<td>' + elem.time + '</td>');
             var $opTd = $('<td></td>');

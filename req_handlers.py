@@ -25,17 +25,21 @@ def index():
         algo：所使用的算法
         args：算法所需的参数，格式为json
 """
-def mining(user, proj, rsrc):
+def mining(uid, token, proj, rsrc):
 
     res = make_response()
     res.headers['Content-Type'] = "application/json"
 
     #获取参数
-    for e in [user, proj, rsrc]:
+    for e in [token, proj, rsrc]:
         if not re.match(r'^\w+$', e):
-            res.data = json.stringify({'succ': False, 'msg': 'Target invalid!'})
+            res.data = json.stringify({'succ': False, 'msg': 'Rsrc invalid!'})
             return res
 
+    if not re.match(r'^\d+$', uid):
+        res.data = json.stringify({'succ': False, 'msg': 'User invalid!'})
+        return res
+    
     # cols=["col0","col1","col2", ...]
     cols = request.form.get('cols')
     if cols:
@@ -86,9 +90,8 @@ def mining(user, proj, rsrc):
         args = {}
 
     context = {
-        "user": user,
-        "proj": proj,
-        "rsrc": rsrc,
+        "user": uid,
+        "rsrc": token + '/' + proj + '/' + rsrc,
         "cols": cols,
         "start": start,
         "end": end,
@@ -119,8 +122,7 @@ def mining(user, proj, rsrc):
     return res
 
 def apriori(context):
-    rawData = getDataFromSvr(context['user'], \
-        context['proj'], context['rsrc'])
+    rawData = getDataFromSvr(context['rsrc'])
     _, data = processData(rawData, context['start'], \
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
@@ -148,8 +150,7 @@ def apriori(context):
     return json.stringify({'succ': True, 'msg': 'Done...'})
 
 def kmedoids(context):
-    rawData = getDataFromSvr(context['user'], \
-        context['proj'], context['rsrc'])
+    rawData = getDataFromSvr(context['rsrc'])
     idList, data = processData(rawData, context['start'], \
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
@@ -176,8 +177,7 @@ def kmedoids(context):
     return json.stringify({'succ': True, 'msg': 'Done...'})
 
 def kmeans(context):
-    rawData = getDataFromSvr(context['user'], \
-        context['proj'], context['rsrc'])
+    rawData = getDataFromSvr(context['rsrc'])
     idList, data = processData(rawData, context['start'], \
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
@@ -221,8 +221,7 @@ def classify(context):
     else:
         assert False
 
-    rawData = getDataFromSvr(context['user'], \
-        context['proj'], context['rsrc'])
+    rawData = getDataFromSvr(context['rsrc'])
     labelList, train = getTrainingSet(rawData, label, context['start'], \
         context['end'], context['cols'])
     trainList = convertDataToArr(train)
@@ -251,21 +250,18 @@ def classify(context):
 
 
 def dbAddHistory(cursor, context, type):
-    sql = 'insert into history (userid, proj, rsrc, tp, tm) values (%s, %s, %s, %s, null)'
-    cursor.execute(sql, (context['user'], context['proj'], context['rsrc'], type))
+    sql = 'insert into history (userid, rsrc, tp, tm) values (%s, %s, %s, null)'
+    cursor.execute(sql, (context['user'], context['rsrc'], type))
     return cursor.lastrowid
 
 def dbWriteBack(cursor, result):
     sql = "insert into result values (%s,%s,%s,%s)"
     cursor.executemany(sql, result)
 
-def getDataFromSvr(user, proj, rsrc):
-    url = config.rmp + '/Entity/' + \
-          user + '/' + \
-          proj + '/' + \
-          rsrc + '/'
+def getDataFromSvr(rsrc):
+    url = config.rmp + '/Entity/' + rsrc + '/'
     jsonStr = urllib2.urlopen(urllib2.Request(url)).read().decode('utf-8')
-    return json.parse(jsonStr)[rsrc]
+    return json.parse(jsonStr)[rsrc.split('/')[-1]]
 
 def convertData(data, start = 0, end = None, cols = [], label = None):
     """
@@ -335,8 +331,7 @@ def convertDataToArr(data):
     return dataList
 
 def getData(context):
-    rawData = getDataFromSvr(context['user'], \
-        context['proj'], context['rsrc'])
+    rawData = getDataFromSvr(context['rsrc'])
 
     cols = context['cols']
     start = context['start']
@@ -346,8 +341,7 @@ def getData(context):
     return idList, dataList
 
 def getDataWithLabel(context):
-    rawData = getDataFromSvr(context['user'], \
-        context['proj'], context['rsrc'])
+    rawData = getDataFromSvr(context['rsrc'])
 
     cols = context['cols']
     start = context['start']
@@ -383,23 +377,20 @@ def iris(user):
         id += 1
     return json.stringify({'iris': r})
 
-def getHistory():
+def getHistory(uid):
     conn = config.getConn()
     cur = conn.cursor()
-    sql = "select id,userid,proj,rsrc,tp,tm from history"
-    cur.execute(sql)
+    sql = "select id,rsrc,tp,tm from history where userid=%s"
+    cur.execute(sql, (uid,))
     result = []
     for row in cur.fetchall():
-        if row[5] is not None:
-            tm = str(row[5])
-        else: 
-            tm = row[5]
+        tm = row[3]
+        if tm is not None:
+            tm = str(tm)
         obj = {
             "id": row[0],
-            "uid": row[1],
-            "proj": row[2],
-            "rsrc": row[3],
-            "type": row[4],
+            "rsrc": row[1],
+            "type": row[2],
             "time": tm
         }
         result.append(obj)
