@@ -6,9 +6,11 @@ import config
 import os
 
 app = Flask(__name__)
-app.add_url_rule('/mining/<uid>/<token>/<proj>/<rsrc>/', view_func=req_handlers.mining, methods=['POST'])
-app.add_url_rule('/history/<uid>/', view_func=req_handlers.getHistory)
+app.add_url_rule('/mining/<int:uid>/<token>/<proj>/<rsrc>/', view_func=req_handlers.mining, methods=['POST'])
+app.add_url_rule('/history/<int:uid>/', view_func=req_handlers.getHistory)
 app.add_url_rule('/result/<int:id>/', view_func=req_handlers.getResultById)
+app.add_url_rule('/message/<int:uid>/', view_func=req_handlers.getMessageUnread)
+app.add_url_rule('/message/<int:uid>/all/', view_func=req_handlers.getMessageAll)
 app.debug = True
 
 @app.route('/<path:path>')

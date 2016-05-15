@@ -35,10 +35,6 @@ def mining(uid, token, proj, rsrc):
         if not re.match(r'^\w+$', e):
             res.data = json.stringify({'succ': False, 'msg': 'Rsrc invalid!'})
             return res
-
-    if not re.match(r'^\d+$', uid):
-        res.data = json.stringify({'succ': False, 'msg': 'User invalid!'})
-        return res
     
     # cols=["col0","col1","col2", ...]
     cols = request.form.get('cols')
@@ -143,6 +139,7 @@ def apriori(context):
         result.append((hid, count, row[2], v))
         count += 1
     dbWriteBack(cursor, result)
+    dbAddMessage(cursor, context, hid)
 
     conn.commit()
     cursor.close()
@@ -170,6 +167,7 @@ def kmedoids(context):
         clusterId += 1
 
     dbWriteBack(cursor, result)
+    dbAddMessage(cursor, context, hid)
 
     conn.commit()
     cursor.close()
@@ -195,6 +193,7 @@ def kmeans(context):
             json.stringify(data[i])))
 
     dbWriteBack(cursor, result)
+    dbAddMessage(cursor, context, hid)
 
     conn.commit()
     cursor.close()
@@ -242,12 +241,17 @@ def classify(context):
         result.append((id, idList[i], rawRes[i], json.stringify(predict[i])))
 
     dbWriteBack(cursor, result)
+    dbAddMessage(cursor, context, id)
 
     conn.commit()
     cursor.close()
     conn.close()
     return json.stringify({'succ': True, 'msg': 'Done...'})
 
+def dbAddMessage(cursor, context, hid):
+    content = "您提交的任务已完成，资源：{0}，ID：{1}。".format(context['rsrc'], hid);
+    sql = 'insert into message (userid, content, tm) values (%s, %s, null)'
+    cursor.execute(sql, (context['user'], content))
 
 def dbAddHistory(cursor, context, type):
     sql = 'insert into history (userid, rsrc, tp, tm) values (%s, %s, %s, null)'
@@ -411,3 +415,32 @@ def getResultById(id):
     conn.close()
     res = make_response(json.stringify({"succ": True, "data": result}))
     return res
+
+def getMessage(uid, isread):
+    conn = config.getConn()
+    cur = conn.cursor()
+    sql = "select id,content,tm,isread from message where userid=%s"
+    if isread == 1:
+        sql += " and isread=1"
+    elif isread == 0:
+        sql += " and isread=0"
+    cur.execute(sql, (uid,))
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    newResult = []
+    for row in result:
+        obj = {
+            "id": row[0],
+            "content": row[1],
+            "tm": str(row[2]),
+            "isread": 1 if row[3] else 0
+        }
+        newResult.append(obj)
+    return newResult
+
+def getMessageUnread(uid):
+    return make_response(json.stringify({"succ": True, "data": getMessage(uid, 0)}))
+
+def getMessageAll(uid):
+    return make_response(json.stringify({"succ": True, "data": getMessage(uid, -1)}))
