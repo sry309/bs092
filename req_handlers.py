@@ -444,3 +444,17 @@ def getMessageUnread(uid):
 
 def getMessageAll(uid):
     return make_response(json.stringify({"succ": True, "data": getMessage(uid, -1)}))
+
+def markMessage(uid, id):
+    conn = config.getConn()
+    cur = conn.cursor()
+    sql = "update message set isread=0 where userid=%s"
+    if id != 0:
+        sql += " and id=" + str(id)
+    cur.execute(sql, (uid,))
+    cur.close()
+    conn.close()
+    return make_response(json.stringify({"succ": True}))
+
+def markMessageAll(uid):
+    return markMessage(uid, 0)
