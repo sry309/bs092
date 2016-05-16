@@ -73,3 +73,7 @@
 .msg-read {
     background: #fff;
 }
+
+#nav-msg .badge {
+    margin-left: 5px;
+}

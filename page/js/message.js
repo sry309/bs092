@@ -23,7 +23,7 @@ $(function() {
     
     var loadMessage = function(list) {
         if(list.length == 0) {
-            $('#msg-li').append('<p>您目前没有任何消息</p>');
+            $('#msg-li').append('<div class="well well-lg">您目前没有任何消息</div>');
             return;
         }
         
