@@ -448,7 +448,7 @@ def getMessageAll(uid):
 def markMessage(uid, id):
     conn = config.getConn()
     cur = conn.cursor()
-    sql = "update message set isread=0 where userid=%s"
+    sql = "update message set isread=1 where userid=%s"
     if id != 0:
         sql += " and id=" + str(id)
     cur.execute(sql, (uid,))
@@ -458,3 +458,13 @@ def markMessage(uid, id):
 
 def markMessageAll(uid):
     return markMessage(uid, 0)
+
+def notify(uid):
+    conn = config.getConn()
+    cur = conn.cursor()
+    sql = "select count(*) from message where userid=%s and isread=0"
+    cur.execute(sql, (uid,))
+    num = cur.fetchall()[0][0]
+    cur.close()
+    conn.close()
+    return make_response(json.stringify({"succ": True, "unread": num}))

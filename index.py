@@ -13,6 +13,7 @@ app.add_url_rule('/message/<int:uid>/', view_func=req_handlers.getMessageUnread)
 app.add_url_rule('/message/<int:uid>/all/', view_func=req_handlers.getMessageAll)
 app.add_url_rule('/message/<int:uid>/mark/<int:id>/', view_func=req_handlers.markMessage)
 app.add_url_rule('/message/<int:uid>/mark/all/', view_func=req_handlers.markMessageAll)
+app.add_url_rule('/notify/<int:uid>/', view_func=req_handlers.notify)
 app.debug = True
 
 @app.route('/<path:path>')
