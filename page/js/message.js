@@ -22,6 +22,10 @@ $(function() {
     };
     
     var loadMessage = function(list) {
+        if(list.length == 0) {
+            $('#msg-li').append('<p>您目前没有任何消息</p>');
+            return;
+        }
         
         $('.msg-well').remove();
         for(var i = 0; i < list.length; i++) {
