@@ -452,6 +452,7 @@ def markMessage(uid, id):
     if id != 0:
         sql += " and id=" + str(id)
     cur.execute(sql, (uid,))
+    conn.commit()
     cur.close()
     conn.close()
     return make_response(json.stringify({"succ": True}))
