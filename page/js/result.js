@@ -106,7 +106,7 @@ $(function() {
         }
         else if(type == 'assoc') {
             $('.visual-dist').addClass('hidden');
-            loadTotalChart(list);
+            loadAssocChart(list);
         }
         else
             throw new Error();
@@ -296,7 +296,61 @@ $(function() {
     
     var loadAssocChart = function (data) {
         
+        $('#assoc-svg').empty();
         
+        var dataDict = {};
+        var srcSet = {};
+        var dstSet = {};
+        for(var i = 0; i < data.length; i++) {
+            var elem = data[i];
+            dataDict[elem[2]] = elem[1];
+            var res = elem[2].split(' -> ');
+            srcSet[res[0]] = 0;
+            dstSet[res[1]] = 1;
+        }
+        srcList = keys(srcSet);
+        dstList = keys(dstSet);
+        
+        points = [];
+        for(var i = 0; i < srcList.length; i++) {
+            for(var j = 0; j < dstList.length; j++) {
+                var k = srcList[i] + ' -> ' + dstList[j];
+                var conf = dataDict[k];
+                points.push({x: j, y: i, conf: conf});
+            }
+        }
+        
+        var padding = {left: 100, right: 20, top: 20, bottom: 100};
+        var maxRadius = 15;
+        var svg = d3.select("#assoc-svg")
+            .attr('width', 800).attr('height', 800);
+        var width = svg.attr("width") - padding.left - padding.right;
+        var height = svg.attr("height") - padding.top - padding.bottom;
+        
+        var xScale = d3.scale.ordinal()
+            .domain(d3.range(dstList.length))
+            .rangeRoundBands([0, width]);
+        var yScale = d3.scale.ordinal()
+            .domain(d3.range(srcList.length))
+            .rangeRoundBands([0, height]);
+        
+        var circles = svg.selectAll('.circle')
+            .data(points)
+            .enter()
+            .append("circle")
+            .attr('cx', function(d) {
+                return xScale(d.x);
+            })
+            .attr('cy', function(d) {
+                return height - yScale(d.y);
+            })
+            .attr('r', function(d) {
+                return d.conf * maxRadius;
+            })
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr('fill', function(d) {
+                return labelToColor(d.x + d.y);
+            });
     };
     
     getResult();
