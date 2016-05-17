@@ -6,6 +6,11 @@ import config
 import os
 
 app = Flask(__name__)
+app.add_url_rule('/System/Project/', view_func=req_handlers.getProj)
+app.add_url_rule('/System/Resource/', view_func=req_handlers.getRsrc)
+app.add_url_rule('/System/Resource/list/', view_func=req_handlers.getRsrcList)
+app.add_url_rule('/Entity/<token>/<proj>/Iris/', view_func=req_handlers.iris)
+app.add_url_rule('/Entity/<token>/<proj>/Cart/', view_func=req_handlers.cart)
 app.add_url_rule('/mining/<int:uid>/<token>/<proj>/<rsrc>/', view_func=req_handlers.mining, methods=['POST'])
 app.add_url_rule('/history/<int:uid>/', view_func=req_handlers.getHistory)
 app.add_url_rule('/result/<int:id>/', view_func=req_handlers.getResultById)
@@ -33,4 +38,4 @@ def redirIndex():
     return redirect('/index.html')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(threaded=True)
