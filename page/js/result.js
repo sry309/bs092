@@ -90,24 +90,30 @@ $(function() {
     
     var loadCharts = function(list) {
         
-        var keyList = keys(list[0][2]);
+        if(type == 'cluster' || type == 'classify') {
+            $('.visual-assoc').addClass('hidden');
+            
+            var keyList = keys(list[0][2]);
         
-        loadTotalChart(list);
-        loadDistChart(list, keyList.slice(0, 2));
+            loadTotalChart(list);
+            loadDistChart(list, keyList.slice(0, 2));
+            
+            var $keyOptions = keyList.map(function(k){return $('<option value="' + k + '">' + k + '</option>');});
+            $('#col1-combo').append($keyOptions);
+            $keyOptions = keyList.map(function(k){return $('<option value="' + k + '">' + k + '</option>');});
+            $('#col2-combo').append($keyOptions);
+            $('#gen-btn').click(function(){genDistChart(list);});
+        }
+        else if(type == 'assoc') {
+            $('.visual-dist').addClass('hidden');
+            loadTotalChart(list);
+        }
+        else
+            throw new Error();
         
-        var $keyOptions = keyList.map(function(k){return $('<option value="' + k + '">' + k + '</option>');});
-        $('#col1-combo').append($keyOptions);
-        $keyOptions = keyList.map(function(k){return $('<option value="' + k + '">' + k + '</option>');});
-        $('#col2-combo').append($keyOptions);
-        $('#gen-btn').click(function(){genDistChart(list);});
     };
     
-    var loadTotalChart = function(list) {
-        if(type != 'cluster' && type != 'classify') {
-            $('.visual-panel').addClass('hidden');
-            return;
-        }
-        
+    var loadTotalChart = function(list) {        
         $('#total-svg').empty();
         
         var labelCountMap = {};
@@ -200,10 +206,6 @@ $(function() {
     };
     
     var loadDistChart = function(data, cols) {
-        if(type != 'cluster' && type != 'classify') {
-            //$('.visual-panel').addClass('hidden');
-            return;
-        }
         
         $('#dist-svg').empty();
         
@@ -290,6 +292,11 @@ $(function() {
                 .attr("transform","translate(" + padding.left + "," + padding.top + ")")
                 .attr('stroke', labelToColor(label));
         }
+    };
+    
+    var loadAssocChart = function (data) {
+        
+        
     };
     
     getResult();
