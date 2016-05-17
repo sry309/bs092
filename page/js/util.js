@@ -1,5 +1,6 @@
 function getUrl() {
-    return 'http://202.120.40.73:28080';
+    //return 'http://202.120.40.73:28080';
+    return 'http://localhost:5000';
 }
 
 function getUser() {

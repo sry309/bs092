@@ -9,7 +9,8 @@ db = {
     'name': 'test'
 }
 
-rmp = 'http://202.120.40.73:28080'
+#rmp = 'http://202.120.40.73:28080'
+rmp = 'http://localhost:5000'
 
 staticPath = 'page'
 
