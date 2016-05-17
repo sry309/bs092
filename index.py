@@ -2,15 +2,20 @@
 
 from flask import Flask, send_from_directory, redirect
 import req_handlers
+import rmp_simulator
 import config
 import os
 
 app = Flask(__name__)
-app.add_url_rule('/System/Project/', view_func=req_handlers.getProj)
-app.add_url_rule('/System/Resource/', view_func=req_handlers.getRsrc)
-app.add_url_rule('/System/Resource/list/', view_func=req_handlers.getRsrcList)
-app.add_url_rule('/Entity/<token>/<proj>/Iris/', view_func=req_handlers.iris)
-app.add_url_rule('/Entity/<token>/<proj>/Cart/', view_func=req_handlers.cart)
+app.debug = True
+
+app.add_url_rule('/System/User/', view_func=rmp_simulator.login)
+app.add_url_rule('/System/Project/', view_func=rmp_simulator.getProj)
+app.add_url_rule('/System/Resource/', view_func=rmp_simulator.getRsrc)
+app.add_url_rule('/System/Resource/list/', view_func=rmp_simulator.getRsrcList)
+app.add_url_rule('/Entity/<token>/<proj>/Iris/', view_func=rmp_simulator.iris)
+app.add_url_rule('/Entity/<token>/<proj>/Cart/', view_func=rmp_simulator.cart)
+
 app.add_url_rule('/mining/<int:uid>/<token>/<proj>/<rsrc>/', view_func=req_handlers.mining, methods=['POST'])
 app.add_url_rule('/history/<int:uid>/', view_func=req_handlers.getHistory)
 app.add_url_rule('/result/<int:id>/', view_func=req_handlers.getResultById)
@@ -19,7 +24,6 @@ app.add_url_rule('/message/<int:uid>/all/', view_func=req_handlers.getMessageAll
 app.add_url_rule('/message/<int:uid>/mark/<int:id>/', view_func=req_handlers.markMessage)
 app.add_url_rule('/message/<int:uid>/mark/all/', view_func=req_handlers.markMessageAll)
 app.add_url_rule('/notify/<int:uid>/', view_func=req_handlers.notify)
-app.debug = True
 
 @app.route('/<path:path>')
 def staticHtml(path):

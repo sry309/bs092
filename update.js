@@ -24,7 +24,8 @@ var getTimeStr = function() {
 var cmds = [
     'git add -A',
     'git commit -m "' + getTimeStr() + '"',
-    'git push'
+    'git push',
+    'git push github master'
 ];
 
 for(var cmd of cmds) {
