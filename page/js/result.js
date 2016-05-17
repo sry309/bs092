@@ -303,24 +303,29 @@ $(function() {
         var dstSet = {};
         for(var i = 0; i < data.length; i++) {
             var elem = data[i];
-            dataDict[elem[2]] = elem[1];
+            dataDict[elem[2]] = Number.parseFloat(elem[1]);
             var res = elem[2].split(' -> ');
             srcSet[res[0]] = 0;
             dstSet[res[1]] = 1;
         }
         srcList = keys(srcSet);
         dstList = keys(dstSet);
+        console.log(dataDict);
+        console.log(srcList);
+        console.log(dstList);
         
         points = [];
         for(var i = 0; i < srcList.length; i++) {
             for(var j = 0; j < dstList.length; j++) {
                 var k = srcList[i] + ' -> ' + dstList[j];
-                var conf = dataDict[k];
-                points.push({x: j, y: i, conf: conf});
+                if(dataDict[k]) {
+                    var conf = dataDict[k];
+                    points.push({x: j, y: i, conf: conf});
+                }
             }
         }
         
-        var padding = {left: 100, right: 20, top: 20, bottom: 100};
+        var padding = {left: 50, right: 0, top: 0, bottom: 20};
         var maxRadius = 15;
         var svg = d3.select("#assoc-svg")
             .attr('width', 800).attr('height', 800);
@@ -339,10 +344,12 @@ $(function() {
             .enter()
             .append("circle")
             .attr('cx', function(d) {
-                return xScale(d.x);
+                return xScale(d.x) + xScale.rangeBand() / 2;
             })
             .attr('cy', function(d) {
-                return height - yScale(d.y);
+                console.log(d, yScale(d.y), srcList.length);
+                return height - yScale(d.y) - yScale.rangeBand() / 2;
+                
             })
             .attr('r', function(d) {
                 return d.conf * maxRadius;
@@ -351,7 +358,40 @@ $(function() {
             .attr('fill', function(d) {
                 return labelToColor(d.x + d.y);
             });
-    };
+            
+            
+        var xTexts = svg.selectAll(".label")
+            .data(dstList)
+            .enter()
+            .append("text")
+            .attr("x", function(d,i){
+                return xScale(i) + xScale.rangeBand() / 2;
+            } )
+            .attr("y", height)
+            .attr("dx", -15)
+            .attr("dy", 0)
+            .text(function(d){
+                return d;
+            })
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr('fill', 'black');
+         
+        var yTexts = svg.selectAll(".label")
+            .data(srcList)
+            .enter()
+            .append("text")
+            .attr("x", 0)
+            .attr("y", function(d, i) {
+                return height - yScale(i) - yScale.rangeBand() / 2;
+            })
+            .attr("dx", 0)
+            .attr("dy", 0)
+            .text(function(d){
+                return d;
+            })
+            .attr("transform","translate(0," + padding.top + ")")
+            .attr('fill', 'black');
+    }
     
     getResult();
 });
