@@ -1,8 +1,27 @@
 # -*- coding: utf-8 -*-
 import math
 
+def distinct(rawData):
+    
+    def key(row):
+        newRow = dict(row)
+        del newRow['id']
+        return newRow
+    
+    result = [dict(row) for row in rawData]
+    result.sort(key=key)
+    
+    left = 0
+    for right in xrange(1, len(result)):
+        if key(result[left]) != key(result[right]) \
+            and left + 1 != right:
+            left += 1
+            result[left] = result[right]
+    print left + 1
+    return result[0:left + 1]
+
 def removeAbsence(data):
-    return [row for row in data if None not in row]
+    return [row[:] for row in data if None not in row]
 
 def fillAbsenceWithVal(data, val):
     result = []
@@ -11,7 +30,7 @@ def fillAbsenceWithVal(data, val):
     return result
 
 def fillAbsenceWithAvg(data):
-    result = data[:]
+    result = [row[:] for row in data]
     wid = len(result[0])
     hei = len(result)
     avg = [0] * wid
@@ -32,7 +51,7 @@ def fillAbsenceWithAvg(data):
     return result
 
 def maxMinRestrict(data):
-    result = data[:]
+    result = [row[:] for row in data]
     wid = len(result[0])
     hei = len(result)
     maxList = [-1] * wid
@@ -53,7 +72,7 @@ def maxMinRestrict(data):
     return result
             
 def zScoreRestrict(data):
-    result = data[:]
+    result = [row[:] for row in data]
     wid = len(result[0])
     hei = len(result)
     avg = [0] * wid
@@ -84,7 +103,7 @@ def getBit(num):
     else: return math.floor(math.log10(num)) + 1
 
 def demicalRestrict(data):
-    result = data[:]
+    result = [row[:] for row in data]
     wid = len(result[0])
     hei = len(result)
     bits = [0] * wid

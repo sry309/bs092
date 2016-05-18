@@ -6,6 +6,7 @@ import config
 import urllib2
 import time
 from threading import Thread
+import dm
 
 import sys
 reload(sys)
@@ -117,12 +118,12 @@ def mining(uid, token, proj, rsrc):
         fillval = request.form.get('fillval')
         if fillval is None: fillval = 0
         formal = request.form.get('formal')
-        distict = request.form.get('distict') == 'true'
+        distinct = request.form.get('distinct') == 'true'
         
         context['absence'] = absence
         context['fillval'] = fillval
         context['formal'] = formal
-        context['distict'] = distict
+        context['distinct'] = distinct
         
     
     
@@ -146,8 +147,7 @@ def mining(uid, token, proj, rsrc):
     return res
 
 def preprocess(data, context):
-    import dm
-    
+
     absence = context['absence']
     if absence == 'rm':
         data = dm.removeAbsence(data)
@@ -172,8 +172,7 @@ def apriori(context):
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
 
-    from dm import apriori
-    rawRes = apriori(dataList)
+    rawRes = dm.apriori(dataList)
 
     conn = config.getConn()
     cursor = conn.cursor()
@@ -197,13 +196,14 @@ def apriori(context):
 
 def kmedoids(context):
     rawData = getDataFromSvr(context['rsrc'])
+    if(context['distinct']):
+        rawData = dm.distinct(rawData)
     idList, data = processData(rawData, context['start'], \
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
     dataList = preprocess(dataList, context)
 
-    from dm import kmedoids
-    _, _, rawRes = kmedoids(dataList)
+    _, _, rawRes = dm.kmedoids(dataList)
 
     conn = config.getConn()
     cursor = conn.cursor()
@@ -226,6 +226,8 @@ def kmedoids(context):
 
 def kmeans(context):
     rawData = getDataFromSvr(context['rsrc'])
+    if(context['distinct']):
+        rawData = dm.distinct(rawData)
     idList, data = processData(rawData, context['start'], \
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
@@ -269,6 +271,8 @@ def classify(context):
         assert False
 
     rawData = getDataFromSvr(context['rsrc'])
+    if(context['distinct']):
+        rawData = dm.distinct(rawData)
     labelList, train = getTrainingSet(rawData, label, context['start'], \
         context['end'], context['cols'])
     trainList = convertDataToArr(train)

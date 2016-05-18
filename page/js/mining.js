@@ -124,9 +124,9 @@ $(function(){
             var absent = $('#absent-combo').val();
             var fillval = $('#fillval-text').val();
             var formal = $('#formal-combo').val();
-            var distict = $('#distict-cb').is(':checked').toString();
+            var distinct = $('#distinct-cb').is(':checked').toString();
             data += '&absent=' + absent + '&fillval=' + 
-                fillval + '&formal=' + formal + '&distict=' + distict;
+                fillval + '&formal=' + formal + '&distinct=' + distinct;
         }
         
         $.ajax({
