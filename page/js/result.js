@@ -9,7 +9,7 @@ $(function() {
     if(type == 'assoc')
     {
         $('<th>关联规则</th>').appendTo($resultHeadTr);
-        $('<th>支持度</th>').appendTo($resultHeadTr);
+        $('<th>置信度</th>').appendTo($resultHeadTr);
     }
     else if(type == 'classify' || type == 'cluster')
     {

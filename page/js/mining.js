@@ -88,17 +88,7 @@ $(function(){
         var start = $('#start-num').val();
         var count = $('#count-num').val();
         if(count == "-1") count = "";
-        
-        var predictStart = $('#predict-start-num').val();
-        var predictCount = $('#predict-count-num').val();
-        if(predictCount == "-1") predictCount = "";
-        var label = $('#predict-label-text').val();
-        if(type == "classify" && label == "")
-        {
-            alert('请填写标签。');
-            return;
-        }
-        
+
         var cols = [];
         for(var k in selected)
             cols.push(k);
@@ -113,10 +103,30 @@ $(function(){
         var url = './mining/' + uid + '/' + token + '/' + proj + '/' + rsrc + '/';
         var data = 'algo=' + algo + '&start=' + start + "&count=" + 
             count + '&cols=' + cols;
+        
         if(type == "classify")
         {
+            var predictStart = $('#predict-start-num').val();
+            var predictCount = $('#predict-count-num').val();
+            if(predictCount == "-1") predictCount = "";
+            var label = $('#predict-label-text').val();
+            if(label == "")
+            {
+                alert('请填写标签。');
+                return;
+            }
+            
             data += '&predictStart=' + predictStart + '&predictCount=' + 
                 predictCount + '&label=' + label;
+        }
+        
+        if(type != 'assoc') {
+            var absent = $('#absent-combo').val();
+            var fillval = $('#fillval-text').val();
+            var formal = $('#formal-combo').val();
+            var distict = $('#distict-cb').is(':checked').toString();
+            data += '&absent=' + absent + '&fillval=' + 
+                fillval + '&formal=' + formal + '&distict=' + distict;
         }
         
         $.ajax({
@@ -163,7 +173,15 @@ $(function(){
             $('.classify-req').addClass('hidden');
     };
     
+    var absentComboOnClick = function() {
+        if($('#absent-combo').val() == "val") 
+            $('.fillval').removeClass('hidden');
+        else
+            $('.fillval').addClass('hidden');
+    };
+    
     getCols();
     initAlgoType();
     $('#mining-btn').click(mining);
+    $('#absent-combo').click(absentComboOnClick);
 });

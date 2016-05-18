@@ -18,6 +18,15 @@ json.parse = json.loads
 def index():
     return 'Hello, Flask!'
 
+def isAssoc(algo):
+    return algo in ['apriori']
+
+def isClassify(algo):
+    return algo in ['naive_bayes', 'knn', 'svm']
+    
+def isCluster(algo):
+    return algo in ['kmeans', 'kmedoids']
+
 """
     参数：
         cols：列名称的列表
@@ -59,24 +68,7 @@ def mining(uid, token, proj, rsrc):
     else:
         end = None
 
-    # predictStart
-    predictStart = request.form.get('predictStart')
-    if predictStart:
-        predictStart = int(predictStart)
-    else:
-        predictStart = 0
-
-    # predictCount
-    predictCount = request.form.get('predictCount')
-    if predictCount:
-        predictCount = int(predictCount)
-        predictEnd = predictStart + predictCount
-    else:
-        predictEnd = None
-
     algo = request.form.get('algo')
-    label = request.form.get('label')
-    if label is None: label = ""
 
     args = request.form.get('args')
     if args:
@@ -93,11 +85,47 @@ def mining(uid, token, proj, rsrc):
         "end": end,
         "algo": algo,
         "args": args,
-        "label" : label,
-        "predictStart": predictStart,
-        "predictEnd": predictEnd
     }
 
+    if isClassify(algo):
+        # predictStart
+        predictStart = request.form.get('predictStart')
+        if predictStart:
+            predictStart = int(predictStart)
+        else:
+            predictStart = 0
+
+        # predictCount
+        predictCount = request.form.get('predictCount')
+        if predictCount:
+            predictCount = int(predictCount)
+            predictEnd = predictStart + predictCount
+        else:
+            predictEnd = None
+        
+        label = request.form.get('label')
+        if label is None: label = ""
+        if not re.match(r'^\w+$', label):
+            return json.stringify({'succ': False, 'msg': 'Label invalid!'})
+        
+        context['predictStart'] = predictStart
+        context['predictEnd'] = predictEnd
+        context['label'] = label
+        
+    if not isAssoc(algo):
+        absence = request.form.get('absence')
+        fillval = request.form.get('fillval')
+        if fillval is None: fillval = 0
+        formal = request.form.get('formal')
+        distict = request.form.get('distict') == 'true'
+        
+        context['absence'] = absence
+        context['fillval'] = fillval
+        context['formal'] = formal
+        context['distict'] = distict
+        
+    
+    
     # 调用具体算法
     funcDict = {
         "kmeans": kmeans,
@@ -116,6 +144,27 @@ def mining(uid, token, proj, rsrc):
     
     res.data = json.stringify({'succ': True, 'msg': 'Done...'})
     return res
+
+def preprocess(data, context):
+    import dm
+    
+    absence = context['absence']
+    if absence == 'rm':
+        data = dm.removeAbsence(data)
+    elif absence == 'val':
+        data = dm.fillAbsenceWithVal(data, context['fillval'])
+    elif absence == 'avg':
+        data = dm.fillAbsenceWithAvg(data)
+    
+    formal = context['formal']
+    if formal == 'maxmin':
+        data = dm.maxMinRestrict(data)
+    elif formal == 'zscore':
+        data = dm.zScoreRestrict(data)
+    elif formal == 'demical':
+        data = dm.demicalRestrict(data)
+
+    return data
 
 def apriori(context):
     rawData = getDataFromSvr(context['rsrc'])
@@ -151,6 +200,7 @@ def kmedoids(context):
     idList, data = processData(rawData, context['start'], \
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
+    dataList = preprocess(dataList, context)
 
     from dm import kmedoids
     _, _, rawRes = kmedoids(dataList)
@@ -179,6 +229,7 @@ def kmeans(context):
     idList, data = processData(rawData, context['start'], \
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
+    dataList = preprocess(dataList, context)
 
     from sklearn.cluster import KMeans
     clf = KMeans()
@@ -202,14 +253,11 @@ def kmeans(context):
 
 def classify(context):
 
-    label = context['label']
-    if not re.match(r'^\w+$', label):
-        return json.stringify({'succ': False, 'msg': 'Label invalid!'})
-
     from sklearn.neighbors import KNeighborsClassifier
     from sklearn.naive_bayes import MultinomialNB
     from sklearn.svm import SVC
 
+    label = context['label']
     algo = context['algo']
     if algo == 'svm':
         classifier = SVC
@@ -224,9 +272,11 @@ def classify(context):
     labelList, train = getTrainingSet(rawData, label, context['start'], \
         context['end'], context['cols'])
     trainList = convertDataToArr(train)
+    trainList = preprocess(trainList, context)
     idList, predict = getPredictSet(rawData, context['predictStart'], \
         context['predictEnd'], context['cols'])
     predictList = convertDataToArr(predict)
+    predictList = preprocess(predictList, context)
 
     clf = classifier()
     clf.fit(trainList, labelList)
@@ -303,13 +353,16 @@ def convertData(data, start = 0, end = None, cols = [], label = None):
 
 def processData(rawData, start = 0, end = None, cols = []):
     data = rawData[start:end]
+    
     idList = []
-    for elem in data:
+    for i in xrange(len(data)):
+        elem = dict(data[i])
         idList.append(elem['id'])
         del elem['id']
         for k, v in elem.items():
             if len(cols) != 0 and k not in cols:
                 del elem[k]
+        data[i] = elem
     return idList, data
 
 getPredictSet = processData
@@ -317,12 +370,14 @@ getPredictSet = processData
 def getTrainingSet(rawData, label, start = 0, end = None, cols = []):
     data = rawData[start:end]
     labelList = []
-    for elem in data:
+    for i in xrange(len(data)):
+        elem = dict(data[i])
         del elem['id']
         labelList.append(elem[label])
         for k, v in elem.items():
             if len(cols) != 0 and k not in cols:
                 del elem[k]
+        data[i] = elem
     return labelList, data
 
 def convertDataToArr(data):
