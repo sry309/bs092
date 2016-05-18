@@ -64,7 +64,7 @@ def zScoreRestrict(data):
             elem = row[i];
             if elem is not None:
                 avg[i] += elem
-                avgpow2 += elem ** 2
+                avgpow2[i] += elem ** 2
                 num[i] += 1
     for i in xrange(wid):
         if(num[i] != 0):

@@ -180,9 +180,9 @@ $(function(){
     
     var absentComboOnClick = function() {
         if($('#absent-combo').val() == "val") 
-            $('.fillval').addClass('hidden');
-        else
             $('.fillval').removeClass('hidden');
+        else
+            $('.fillval').addClass('hidden');
     };
     
     getCols();
