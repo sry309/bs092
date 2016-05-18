@@ -171,13 +171,18 @@ $(function(){
             $('.classify-req').removeClass('hidden');
         else
             $('.classify-req').addClass('hidden');
+        
+        if(type == 'assoc')
+            $('#prepro-panel').addClass('hidden');
+        else
+            $('#prepro-panel').removeClass('hidden')
     };
     
     var absentComboOnClick = function() {
         if($('#absent-combo').val() == "val") 
-            $('.fillval').removeClass('hidden');
-        else
             $('.fillval').addClass('hidden');
+        else
+            $('.fillval').removeClass('hidden');
     };
     
     getCols();
