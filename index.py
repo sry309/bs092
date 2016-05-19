@@ -18,6 +18,7 @@ app.add_url_rule('/Entity/<token>/<proj>/Cart/', view_func=rmp_simulator.cart)
 
 app.add_url_rule('/mining/<int:uid>/<token>/<proj>/<rsrc>/', view_func=req_handlers.mining, methods=['POST'])
 app.add_url_rule('/history/<int:uid>/', view_func=req_handlers.getHistory)
+app.add_url_rule('/history/<int:uid>/<int:id>/', view_func=req_handlers.getHistoryById)
 app.add_url_rule('/result/<int:id>/', view_func=req_handlers.getResultById)
 app.add_url_rule('/message/<int:uid>/', view_func=req_handlers.getMessageUnread)
 app.add_url_rule('/message/<int:uid>/all/', view_func=req_handlers.getMessageAll)

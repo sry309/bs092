@@ -34,7 +34,9 @@ $(function() {
             var $well = $('<div class="well msg-well"></div>');
             $well.attr('data-id', elem.id);
             if(elem.isread) $well.addClass('msg-read');
-            $well.append(htmlSpecialChars(elem.content));
+            $link = $('<a href="#" class="msg-link"></a>');
+            $link.text(elem.content);
+            $well.append($link);
             
             if(!elem.isread) {
                 $markSpan = $('<a href="#" class="msg-mark">标记已读</a>')
@@ -48,6 +50,7 @@ $(function() {
             $('#msg-li').append($well);
         }
         $('.msg-mark').click(markRead);
+        $('.msg-link').click(viewResult);
     };
     
     var markRead = function() {
@@ -70,6 +73,26 @@ $(function() {
         });
     }
     
+    var viewResult = function() {
+        event.preventDefault();
+        id = /ID：(\d+)/.exec($(this).text())[1];
+        $.ajax({
+            type: "GET",
+            url: "history/" + uid + '/' + id + '/',
+            dataType: "json"
+        }).done(function(json) {
+            if (!json.succ) 
+                alert(json.errmsg);
+            else {
+                localStorage.setItem('resultId', id);
+                localStorage.setItem('resultRsrc', json.data[0].rsrc);
+                localStorage.setItem('resultType', json.data[0].type);
+                location.href = './result.html';
+            }
+        }).fail(function(data) {
+            alert('Network error!');
+        });
+    }
     
     getMessage(false);
 });

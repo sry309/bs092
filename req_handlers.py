@@ -421,11 +421,16 @@ def getDataWithLabel(context):
 
     return dataList, labelList, idList, predictList
 
-
 def getHistory(uid):
+    return getHistoryById(uid, 0)
+
+# id=0时为全部
+def getHistoryById(uid, id):
     conn = config.getConn()
     cur = conn.cursor()
     sql = "select id,rsrc,tp,tm from history where userid=%s"
+    if id != 0:
+        sql += ' and id=' + str(id)
     cur.execute(sql, (uid,))
     result = []
     for row in cur.fetchall():
@@ -457,6 +462,7 @@ def getResultById(id):
     res = make_response(json.stringify({"succ": True, "data": result}))
     return res
 
+# isread=-1时为全部
 def getMessage(uid, isread):
     conn = config.getConn()
     cur = conn.cursor()
@@ -465,6 +471,7 @@ def getMessage(uid, isread):
         sql += " and isread=1"
     elif isread == 0:
         sql += " and isread=0"
+    sql += " order by id desc"
     cur.execute(sql, (uid,))
     result = cur.fetchall()
     cur.close()
@@ -478,14 +485,15 @@ def getMessage(uid, isread):
             "isread": 1 if row[3] else 0
         }
         newResult.append(obj)
-    return newResult
+    return make_response(json.stringify({"succ": True, "data": newResult}))
 
 def getMessageUnread(uid):
-    return make_response(json.stringify({"succ": True, "data": getMessage(uid, 0)}))
+    return getMessage(uid, 0)
 
 def getMessageAll(uid):
-    return make_response(json.stringify({"succ": True, "data": getMessage(uid, -1)}))
+    return getMessage(uid, -1)
 
+# id=0 为全部
 def markMessage(uid, id):
     conn = config.getConn()
     cur = conn.cursor()
