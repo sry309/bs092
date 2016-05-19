@@ -38,6 +38,10 @@ def staticJs(path):
 def staticCss(path):
     return send_from_directory(os.path.join(config.staticPath, 'css'), path)
 
+@app.route('/img/<path:path>')
+def staticImg(path):
+    return send_from_directory(os.path.join(config.staticPath, 'img'), path)
+
 @app.route('/')
 def redirIndex():
     return redirect('/index.html')

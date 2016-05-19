@@ -3,6 +3,7 @@ $(function(){
     var uid = localStorage['id'];
     
     var getHistory = function() {
+        $('#modal-loading').modal('show');
         $.ajax({
             type: "GET",
             url: "history/" + uid + '/',
@@ -10,10 +11,13 @@ $(function(){
         }).done(function(json) {
             if (!json.succ) 
                 alert(json.errmsg);
-            else
+            else {
                 loadHistory(json.data);
+                $('#modal-loading').modal('hide');
+            }
         }).fail(function(data) {
             alert('Network error!');
+            $('#modal-loading').modal('hide');
         });
     };
     
@@ -57,7 +61,6 @@ $(function(){
         localStorage.setItem('resultType', type);
         location.href = './result.html';
     }
-    
     
     getHistory();
 });
