@@ -7,6 +7,8 @@ $(function(){
     
     var getProj = function()
     {
+        $('#modal-loading').modal('show');
+        
         $.ajax({
             type: "GET",
             url: url,
@@ -21,8 +23,10 @@ $(function(){
                 alert(errmsg);
             else
                 loadProj($data.find('project'));
+            $('#modal-loading').modal('hide');
         }).fail(function(data) {
             alert('Network error!');
+            $('#modal-loading').modal('hide');
         });
     };
     

@@ -21,6 +21,8 @@ $(function() {
         throw new Error();
     
     var getResult = function() {
+        
+        $('#modal-loading').modal('show');
         $.ajax({
             type: "GET",
             url: "result/" + id + '/',
@@ -37,9 +39,11 @@ $(function() {
                 loadPagBar(1, totalPage, data);
                 loadResult(data.slice(0, pageCap));
                 loadCharts(data);
+                $('#modal-loading').modal('hide');
             }
         }).fail(function(data) {
             alert('Network error!');
+            $('#modal-loading').modal('hide');
         });
     };
 

@@ -11,10 +11,9 @@ $(function(){
         }).done(function(json) {
             if (!json.succ) 
                 alert(json.errmsg);
-            else {
+            else 
                 loadHistory(json.data);
-                $('#modal-loading').modal('hide');
-            }
+            $('#modal-loading').modal('hide');
         }).fail(function(data) {
             alert('Network error!');
             $('#modal-loading').modal('hide');

@@ -4,6 +4,7 @@ $(function() {
     
     var getMessage = function(all) {
         
+        $('#modal-loading').modal('show');
         var url = "message/" + uid + '/';
         if(all) url += 'all/';
         
@@ -16,8 +17,10 @@ $(function() {
                 alert(json.errmsg);
             else
                 loadMessage(json.data);
+            $('#modal-loading').modal('hide');
         }).fail(function(data) {
             alert('Network error!');
+            $('#modal-loading').modal('hide');
         });
     };
     

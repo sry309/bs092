@@ -2,6 +2,7 @@ $(function() {
     
     var getRsrc = function() {
         
+        $('#modal-loading').modal('show');
         var proj = localStorage.getItem('proj');
         var token = localStorage.getItem('token');
         $('#proj-name').text(proj);
@@ -22,9 +23,10 @@ $(function() {
                 alert(errmsg);
             else
                 loadRsrc($(data).find("resource"));
-
+            $('#modal-loading').modal('hide');
         }).fail(function(data, status, e){
             alert("network error");
+            $('#modal-loading').modal('hide');
         });
     };
     

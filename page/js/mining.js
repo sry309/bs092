@@ -5,6 +5,7 @@ $(function(){
     
     var getCols = function() {
         
+        $('#modal-loading').modal('show');
         var user = getUser();
         var proj = localStorage.getItem('proj');
         var token = localStorage.getItem('token');
@@ -27,9 +28,10 @@ $(function(){
                 alert(errmsg);
             else
                 loadCols($(data).find("Column"));
-
+            $('#modal-loading').modal('hide');
         }).fail(function(data, status, e){
             alert("network error");
+            $('#modal-loading').modal('hide');
         });
     };
     
