@@ -425,13 +425,16 @@ def getHistory(uid):
     return getHistoryById(uid, 0)
 
 # id=0时为全部
-def getHistoryById(uid, id):
-    conn = config.getConn()
-    cur = conn.cursor()
-    sql = "select id,rsrc,tp,tm from history where userid=%s"
+def dbGetHistory(cur, uid, id):
+    sql = "select id,rsrc,tp,tm from history where 1=1"
+    args = []
     if id != 0:
-        sql += ' and id=' + str(id)
-    cur.execute(sql, (uid,))
+        sql += ' and id=%s'
+        args.append(id)
+    if uid != 0:
+        sql += ' and uid=%s'
+        args.append(uid)
+    cur.execute(sql, tuple(args))
     result = []
     for row in cur.fetchall():
         tm = row[3]
@@ -443,23 +446,81 @@ def getHistoryById(uid, id):
             "type": row[2],
             "time": tm
         }
-        result.append(obj)
+    result.append(obj)
+    return result
+
+# id=0时为全部
+def getHistoryById(uid, id):
+    conn = config.getConn()
+    cur = conn.cursor()
+    result = dbGetHistory(cur, uid, id)
     cur.close()
     conn.close()
-
     res = make_response(json.stringify({"succ": True, "data": result}))
     res.headers["Content-Type"] = "application/json"
     return res
 
-def getResultById(id):
-    conn = config.getConn()
-    cur = conn.cursor()
+def dbGetResult(cur, id):
     sql = "select id,res1,res2 from result where hid=%s"
     cur.execute(sql, (id,))
     result = cur.fetchall()
+    return result
+
+def getResultById(id):
+    conn = config.getConn()
+    cur = conn.cursor()
+    result = dbGetResult(cur, id)
     cur.close()
     conn.close()
     res = make_response(json.stringify({"succ": True, "data": result}))
+    return res
+
+def csvForm(s):
+    s = str(s)
+    if ',' in s:
+        s = '"' + s + '"'
+    return s
+
+def getResultCsv(id):
+    conn = config.getConn()
+    cur = conn.cursor()
+    history = dbGetHistory(cur, 0, id)
+    data = dbGetResult(cur, id)
+    cur.close()
+    conn.close()
+    
+    if len(history) == 0:
+        assert False
+    history = history[0]
+    
+    data = [list(row) for row in data]
+    for row in data:
+        row[2] = json.parse(row[2])
+    attrs = data[0][2].keys()
+    
+    from cStringIO import StringIO
+    buffer = StringIO()
+    
+    headLine = []
+    headLine.append('id')
+    for k in attrs: headLine.append(k)
+    headLine.append('label')
+    buffer.write(','.join(headLine))
+    buffer.write('\n')
+    
+    for row in data:
+        line = []
+        line.append(str(row[0]))
+        for k in attrs: line.append(str(row[2][k]))
+        line.append(str(row[1]))
+        line = map(csvForm, line)
+        buffer.write(','.join(line))
+        buffer.write('\n')
+    
+    result = buffer.getvalue()
+    res = make_response(result)
+    res.headers["Content-Type"] = "application/csv;charset=utf-8"
+    res.headers["Content-Disposition"] = "attachment; filename=" + str(id) + ".csv"
     return res
 
 # isread=-1时为全部
