@@ -37,8 +37,11 @@ $(function(){
             var $timeTd = $('<td>' + elem.time + '</td>');
             var $opTd = $('<td></td>');
             var $viewAnchor = $('<a href="#" class="view-result">查看</a>');
+            var $csvAnchor = $('<a href="/result/' + elem.id + '/csv/" target="_blank">导出</a>');
             
             $opTd.append($viewAnchor);
+            $opTd.append(' ');
+            $opTd.append($csvAnchor);
             $tr.append($idTd);
             $tr.append($rsrcTd);
             $tr.append($typeTd);

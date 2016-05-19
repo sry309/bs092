@@ -478,18 +478,18 @@ def getResultById(id):
 def csvForm(s):
     s = str(s)
     if ',' in s:
-        s = '"' + s + '"'
+        s = '"' + s.replace('"', '""') + '"'
     return s
 
 def generateCsvAssoc(data):
     from cStringIO import StringIO
     buffer = StringIO()
-    headLine = ['id', 'rule', 'conf']
+    headLine = ['rule', 'conf']
     buffer.write(','.join(headLine))
     buffer.write('\n')
     
     for row in data:
-        line = map(csvForm, [row[0], row[2], row[1]])
+        line = map(csvForm, [row[2], row[1]])
         buffer.write(','.join(line))
         buffer.write('\n')
         
