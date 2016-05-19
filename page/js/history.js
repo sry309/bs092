@@ -31,7 +31,8 @@ $(function(){
             var url = getUrl() + '/Entity/' + elem.rsrc + '/';
             
             var $tr = $('<tr class="history-row"></tr>');
-            var $idTd = $('<td class="history-id">' + elem.id + '</td>');
+            $tr.attr('data-id', elem.id);
+            var $titleTd = $('<td>' + (elem.title || elem.id) + '</td>');
             var $rsrcTd = $('<td class="history-rsrc"><a href="' + url + '" target="_blank">' + elem.rsrc + '</a></td>');
             var $typeTd = $('<td class="history-type" data-type="' + elem.type + '">' + algoDict[elem.type] + '</td>');
             var $timeTd = $('<td>' + elem.time + '</td>');
@@ -42,7 +43,7 @@ $(function(){
             $opTd.append($viewAnchor);
             $opTd.append(' ');
             $opTd.append($csvAnchor);
-            $tr.append($idTd);
+            $tr.append($titleTd);
             $tr.append($rsrcTd);
             $tr.append($typeTd);
             $tr.append($timeTd);
@@ -55,7 +56,7 @@ $(function(){
     
     var viewResult = function() {
         event.preventDefault();
-        var id = $(this).parent().parent().children('.history-id').text();
+        var id = $(this).parent().parent().data('data-id');
         var rsrc = $(this).parent().parent().children('.history-rsrc').text();
         var type = $(this).parent().parent().children('.history-type').attr('data-type');
         localStorage.setItem('resultId', id);

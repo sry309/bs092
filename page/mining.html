@@ -44,59 +44,20 @@
             </tr>
         </table>
     </div>
-    <div class="panel panel-primary" id="prepro-panel">
-        <div class="panel-heading">
-            <p class="panel-title">预处理</p>
-        </div>
-        <div class="panel-body">
-            <div class='row'>
-                <div class='col-md-3 col-sm-6'>
-                    <p class="form-label">缺失值</p>
-                </div>
-                <div class='col-md-3 col-sm-6'>
-                    <select id="absent-combo" class="form-control">
-                        <option value="">不处理</option>
-                        <option value="rm">移除</option>
-                        <option value="val">自定义填充</option>
-                        <option value="avg">均值填充</option>
-                    </select>
-                </div>
-                <div class='col-md-3 col-sm-6 fillval hidden'>
-                    <p class="form-label">填充值</p>
-                </div>
-                <div class='col-md-3 col-sm-6 fillval hidden'>
-                    <input class="form-control" id="fillval-text" type="text" value="0" />
-                </div>
-            </div>
-            <div class='row'>
-                <div class='col-md-3 col-sm-6'>
-                    <p class="form-label">规范化</p>
-                </div>
-                <div class='col-md-3 col-sm-6'>
-                    <select id="formal-combo" class="form-control">
-                        <option value="">无</option>
-                        <option value="maxmin">最大最小值</option>
-                        <option value="zscore">Z-Score</option>
-                        <option value="demical">小数定标</option>
-                    </select>
-                </div>
-            </div>
-            <div class='row'>
-                <div class='col-md-3 col-sm-6'>
-                    <p class="form-label">去重复</p>
-                </div>
-                <div class='col-md-3 col-sm-6'>
-                    <input type="checkbox" class="form-control" 
-                        id="distinct-cb" style="width:34px"/>
-                </div>
-            </div>
-        </div>
-    </div>
+    
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <p class="panel-title">算法</p>
+            <p class="panel-title">基本设置</p>
         </div>
         <div class="panel-body">
+            <div class='row'>
+                <div class='col-md-3 col-sm-6'>
+                    <p class="form-label">名称</p>
+                </div>
+                <div class='col-md-3 col-sm-6'>
+                    <input type="text" id="title-txt" class="form-control"/>
+                </div>
+            </div>
             <div class='row'>
                 <div class='col-md-3 col-sm-6'>
                     <p class="form-label">算法类别</p>
@@ -149,6 +110,56 @@
             </div>
         </div>
     </div>
+    
+    <div class="panel panel-primary" id="prepro-panel">
+        <div class="panel-heading">
+            <p class="panel-title">预处理</p>
+        </div>
+        <div class="panel-body">
+            <div class='row'>
+                <div class='col-md-3 col-sm-6'>
+                    <p class="form-label">缺失值</p>
+                </div>
+                <div class='col-md-3 col-sm-6'>
+                    <select id="absent-combo" class="form-control">
+                        <option value="">不处理</option>
+                        <option value="rm">移除</option>
+                        <option value="val">自定义填充</option>
+                        <option value="avg">均值填充</option>
+                    </select>
+                </div>
+                <div class='col-md-3 col-sm-6 fillval hidden'>
+                    <p class="form-label">填充值</p>
+                </div>
+                <div class='col-md-3 col-sm-6 fillval hidden'>
+                    <input class="form-control" id="fillval-text" type="text" value="0" />
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-3 col-sm-6'>
+                    <p class="form-label">规范化</p>
+                </div>
+                <div class='col-md-3 col-sm-6'>
+                    <select id="formal-combo" class="form-control">
+                        <option value="">无</option>
+                        <option value="maxmin">最大最小值</option>
+                        <option value="zscore">Z-Score</option>
+                        <option value="demical">小数定标</option>
+                    </select>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-3 col-sm-6'>
+                    <p class="form-label">去重复</p>
+                </div>
+                <div class='col-md-3 col-sm-6'>
+                    <input type="checkbox" class="form-control" 
+                        id="distinct-cb" style="width:34px"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="panel panel-primary">
         <div class="panel-heading">
             <p class="panel-title">参数</p>

@@ -46,6 +46,12 @@ def mining(uid, token, proj, rsrc):
             res.data = json.stringify({'succ': False, 'msg': 'Rsrc invalid!'})
             return res
     
+    # title
+    title = request.form.get('title')
+    if not title:
+        res.data = json.stringify({'succ': False, 'msg': 'No title!'})
+        return res
+    
     # cols=["col0","col1","col2", ...]
     cols = request.form.get('cols')
     if cols:
@@ -80,6 +86,7 @@ def mining(uid, token, proj, rsrc):
 
     context = {
         "user": uid,
+        "title": title,
         "rsrc": token + '/' + proj + '/' + rsrc,
         "cols": cols,
         "start": start,
@@ -308,8 +315,8 @@ def dbAddMessage(cursor, context, hid):
     cursor.execute(sql, (context['user'], content))
 
 def dbAddHistory(cursor, context, type):
-    sql = 'insert into history (userid, rsrc, tp, tm) values (%s, %s, %s, null)'
-    cursor.execute(sql, (context['user'], context['rsrc'], type))
+    sql = 'insert into history (userid, title, rsrc, tp, tm) values (%s, %s, %s, %s, null)'
+    cursor.execute(sql, (context['user'], context['title'], context['rsrc'], type))
     return cursor.lastrowid
 
 def dbWriteBack(cursor, result):
@@ -426,7 +433,7 @@ def getHistory(uid):
 
 # id=0时为全部
 def dbGetHistory(cur, uid, id):
-    sql = "select id,rsrc,tp,tm from history where 1=1"
+    sql = "select id,rsrc,tp,tm,title from history where 1=1"
     args = []
     if id != 0:
         sql += ' and id=%s'
@@ -437,14 +444,12 @@ def dbGetHistory(cur, uid, id):
     cur.execute(sql, tuple(args))
     result = []
     for row in cur.fetchall():
-        tm = row[3]
-        if tm is not None:
-            tm = str(tm)
         obj = {
             "id": row[0],
             "rsrc": row[1],
             "type": row[2],
-            "time": tm
+            "time": str(row[3]),
+            "title": row[4]
         }
         result.append(obj)
     return result

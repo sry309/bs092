@@ -26,3 +26,9 @@ create table message
     tm timestamp,
     isread tinyint default 0
 ) DEFAULT CHARSET=utf8
+
+create table email
+(
+    userid varchar(16) primary key,
+    email varchar(32)
+)DEFAULT CHARSET=utf8

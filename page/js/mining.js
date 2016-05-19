@@ -91,6 +91,13 @@ $(function(){
         var count = $('#count-num').val();
         if(count == "-1") count = "";
 
+        var title = $('#title-txt').val();
+        if(title == "")
+        {
+            alert('名称不能为空！');
+            return;
+        }
+        
         var cols = [];
         for(var k in selected)
             cols.push(k);
@@ -104,7 +111,7 @@ $(function(){
         
         var url = './mining/' + uid + '/' + token + '/' + proj + '/' + rsrc + '/';
         var data = 'algo=' + algo + '&start=' + start + "&count=" + 
-            count + '&cols=' + cols;
+            count + '&cols=' + cols + '&title=' + title;
         
         if(type == "classify")
         {
