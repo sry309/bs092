@@ -35,6 +35,7 @@ $(function() {
             var $item = $list.eq(i);
             var name = $item.children('name').text();
             var status = $item.children('state').text();
+            status = (status == 'OK')? '√': '×';
             var lastModified = $item.children('lastmodified').text();
             
             var $tr = $('<tr class="rsrc-row"></tr>');

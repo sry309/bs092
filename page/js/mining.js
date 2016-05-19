@@ -39,9 +39,9 @@ $(function(){
         {
             var $item = $list.eq(i);
             var name = $item.children('ColumnName').text();
-            var alias = $item.children('AttributeName').text();
+            var alias = $item.children('AttributeName').text() || "（未设置）";
             var size = $item.children('Size').text();
-            var isNotNull = $item.children('NotNull').text();
+            //var isNotNull = $item.children('NotNull').text();
             var type = $item.children('Type').text();
             if(size) type += ' * ' + size;
             
@@ -49,7 +49,7 @@ $(function(){
             var $nameTd = $('<td class="cols-name">' + name + '</td>');
             var $aliasTd = $('<td>' + alias + '</td>');
             var $typeTd = $('<td>' + type + '</td>');
-            var $isNotNullTd = $('<td>' + isNotNull + '</td>');
+            var $isNotNullTd = $('<td>是</td>');
             var $opTd = $('<td></td>');
             var $selectCheck = $('<input type="checkbox" class="cols-select" />');
             $opTd.append($selectCheck);
