@@ -32,7 +32,7 @@
 
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <p class="panel-title" id="rsrc-name"></p>
+            <p class="panel-title">属性</p>
         </div>
         <table class="table table-striped panel-body" id="cols-table">
             <tr>
@@ -43,8 +43,12 @@
                 <th>选定</th>
             </tr>
         </table>
-        <div class="panel-body" id="prepro-panel" 
-            style="border-bottom: 1px solid #eee">
+    </div>
+    <div class="panel panel-primary" id="prepro-panel">
+        <div class="panel-heading">
+            <p class="panel-title">预处理</p>
+        </div>
+        <div class="panel-body">
             <div class='row'>
                 <div class='col-md-3 col-sm-6'>
                     <p class="form-label">缺失值</p>
@@ -86,6 +90,11 @@
                         id="distinct-cb" style="width:34px"/>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <p class="panel-title">算法</p>
         </div>
         <div class="panel-body">
             <div class='row'>
@@ -138,15 +147,25 @@
                     <input type="text" id="predict-label-text" class="form-control" />
                 </div>
             </div>
-            <hr />
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <p class="panel-title">参数</p>
+        </div>
+        <div class="panel-body">
             <div class='row'>
-                <div class='col-md-3 col-sm-12'>
-                    <input type="button" id="mining-btn" class="btn btn-primary btn-block" value="挖掘" />
-                </div>
+                
             </div>
         </div>
     </div>
-
+    
+    <div class='row'>
+        <div class="col-md-3 col-sm-12" style="float:right">
+            <input type="button" id="mining-btn" 
+                class="btn btn-primary btn-block" value="挖掘" />
+        </div>
+    </div>
 </div>
 </body>
 </html>
