@@ -432,7 +432,7 @@ def dbGetHistory(cur, uid, id):
         sql += ' and id=%s'
         args.append(id)
     if uid != 0:
-        sql += ' and uid=%s'
+        sql += ' and userid=%s'
         args.append(uid)
     cur.execute(sql, tuple(args))
     result = []
@@ -446,7 +446,7 @@ def dbGetHistory(cur, uid, id):
             "type": row[2],
             "time": tm
         }
-    result.append(obj)
+        result.append(obj)
     return result
 
 # id=0时为全部
@@ -481,18 +481,21 @@ def csvForm(s):
         s = '"' + s + '"'
     return s
 
-def getResultCsv(id):
-    conn = config.getConn()
-    cur = conn.cursor()
-    history = dbGetHistory(cur, 0, id)
-    data = dbGetResult(cur, id)
-    cur.close()
-    conn.close()
+def generateCsvAssoc(data):
+    from cStringIO import StringIO
+    buffer = StringIO()
+    headLine = ['id', 'rule', 'conf']
+    buffer.write(','.join(headLine))
+    buffer.write('\n')
     
-    if len(history) == 0:
-        assert False
-    history = history[0]
-    
+    for row in data:
+        line = map(csvForm, [row[0], row[2], row[1]])
+        buffer.write(','.join(line))
+        buffer.write('\n')
+        
+    return buffer.getvalue()
+
+def generateCsvOther(data): 
     data = [list(row) for row in data]
     for row in data:
         row[2] = json.parse(row[2])
@@ -517,7 +520,24 @@ def getResultCsv(id):
         buffer.write(','.join(line))
         buffer.write('\n')
     
-    result = buffer.getvalue()
+    return buffer.getvalue()
+
+def getResultCsv(id):
+    conn = config.getConn()
+    cur = conn.cursor()
+    history = dbGetHistory(cur, 0, id)
+    data = dbGetResult(cur, id)
+    cur.close()
+    conn.close()
+    
+    if len(history) == 0:
+        assert False
+    history = history[0]
+    
+    if history['type'] == 'assoc':
+        result = generateCsvAssoc(data)
+    else:
+        result = generateCsvOther(data)
     res = make_response(result)
     res.headers["Content-Type"] = "application/csv;charset=utf-8"
     res.headers["Content-Disposition"] = "attachment; filename=" + str(id) + ".csv"
