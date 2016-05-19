@@ -2,6 +2,12 @@
 
 * { font-family: "Microsoft YaHei"; }
 
+@media (min-width: 1500px) {
+    .container {
+        width: 1470px;
+    }
+}
+
 .col-md-1,
 .col-md-2,
 .col-md-3,
@@ -76,4 +82,10 @@
 
 #nav-msg .badge {
     margin-left: 5px;
+}
+
+.footer {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
 }
