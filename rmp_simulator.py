@@ -61,12 +61,12 @@ def getRsrcList():
             <resource>
                 <name>Iris</name>
                 <lastmodified>Tue May 17 2016 10:46:43</lastmodified>
-                <state>OK</state>
+                <state>loaded</state>
             </resource>
             <resource>
                 <name>Cart</name>
                 <lastmodified>Tue May 17 2016 10:46:43</lastmodified>
-                <state>OK</state>
+                <state>loaded</state>
             </resource>
         </resources>
     """

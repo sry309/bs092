@@ -32,6 +32,7 @@ $(function(){
     
     var loadProj = function($list)
     {
+        tmStr = getTimeStr();
         $('.proj-row').remove();
         for(var i = 0; i < $list.length; i++)
         {
@@ -40,7 +41,7 @@ $(function(){
             var tmp = name.split("/", 2);
             localStorage.setItem('token', tmp[0]);
             name = tmp[1];
-            var time = $elem.find('time').text();
+            var time = $elem.find('time').text() || tmStr;
             var status = parseInt($elem.find("privilege").text());
             status = statusMap[status];
             

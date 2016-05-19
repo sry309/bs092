@@ -1,6 +1,6 @@
 function getUrl() {
-    //return 'http://202.120.40.73:28080';
-    return 'http://localhost:5000';
+    return 'http://202.120.40.73:28080';
+    //return 'http://localhost:5000';
 }
 
 function getUser() {
@@ -209,3 +209,24 @@ function graham(arr) {
     }
     return res;
 }
+
+var getTimeStr = function(tm) {
+    
+    var tm = tm || new Date();
+    var o = {
+        yr: tm.getFullYear(),
+        mon: tm.getMonth() + 1,
+        dt: tm.getDate(),
+        hr: tm.getHours(),
+        min: tm.getMinutes(),
+        sec: tm.getSeconds()
+    };
+    for(var i in o)
+    {
+        o[i] = o[i].toString();
+        if(o[i].length < 2)
+            o[i] = '0' + o[i];
+    }
+    return o.yr + '-' + o.mon + '-' + o.dt + 
+        ' ' + o.hr + ':' + o.min + ':' + o.sec;
+};
