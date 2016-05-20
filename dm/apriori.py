@@ -101,10 +101,11 @@ def calcConf( freqSet, H, supportData, brl, minConf=0.7 ):
     '''
     prunedH = []
     for conseq in H:
-        conf = supportData[ freqSet ] / supportData[ freqSet - conseq ]
+        freqSetSupport = supportData[ freqSet ]
+        srcSupport = supportData[ freqSet - conseq ]
+        conf = freqSetSupport / srcSupport
         if conf >= minConf:
-            # print freqSet - conseq, '-->', conseq, 'conf:', conf
-            brl.append( ( freqSet - conseq, conseq, conf ) )
+            brl.append( ( freqSet - conseq, conseq, conf, freqSetSupport, srcSupport ) )
             prunedH.append( conseq )
     return prunedH
 def rulesFromConseq( freqSet, H, supportData, brl, minConf=0.7 ):
@@ -146,15 +147,17 @@ def generateRules( L, supportData, minConf=0.7 ):
 
 def apriori(dataSet, minSupport=0.5, minConf=0.7):
     L, suppData = _apriori(dataSet, minSupport)
+    print suppData
     return generateRules(L, suppData, minConf)
 
 def printRules(rules):
     for row in rules:
-        # print row[0], '---->', row[1], ' conf: ', row[2]
-        print '{0} ----> {1} conf: {2}'.format(
+        print '{0} ----> {1} conf: {2} support: {3}, {4}'.format(
             ', '.join(row[0]),
             ', '.join(row[1]),
-            row[2]
+            row[2],
+            row[3],
+            row[4]
         )
 
 if __name__ == '__main__':
