@@ -191,9 +191,9 @@ def apriori(context):
             ', '.join(row[0]),
             ', '.join(row[1])
         )
-        result.append((hid, count, row[2], v))
+        result.append((hid, count, row[2], v, row[3], row[4]))
         count += 1
-    dbWriteBack(cursor, result)
+    dbWriteBackAssoc(cursor, result)
     dbAddMessage(cursor, context, hid)
 
     conn.commit()
@@ -320,7 +320,11 @@ def dbAddHistory(cursor, context, type):
     return cursor.lastrowid
 
 def dbWriteBack(cursor, result):
-    sql = "insert into result values (%s,%s,%s,%s)"
+    sql = "insert into result (hid, id, res1, res2) values (%s,%s,%s,%s)"
+    cursor.executemany(sql, result)
+
+def dbWriteBackAssoc(cursor, result):
+    sql = "insert into result (hid, id, res1, res2, res3, res4) values (%s,%s,%s,%s,%s,%s)"
     cursor.executemany(sql, result)
 
 def getDataFromSvr(rsrc):
@@ -466,7 +470,7 @@ def getHistoryById(uid, id):
     return res
 
 def dbGetResult(cur, id):
-    sql = "select id,res1,res2 from result where hid=%s"
+    sql = "select id,res1,res2,res3,res4 from result where hid=%s"
     cur.execute(sql, (id,))
     result = cur.fetchall()
     return result
@@ -489,12 +493,12 @@ def csvForm(s):
 def generateCsvAssoc(data):
     from cStringIO import StringIO
     buffer = StringIO()
-    headLine = ['rule', 'conf']
+    headLine = ['rule', 'conf', 'frequent support', 'src support']
     buffer.write(','.join(headLine))
     buffer.write('\n')
     
     for row in data:
-        line = map(csvForm, [row[2], row[1]])
+        line = map(csvForm, [row[2], row[1], row[3], row[4]])
         buffer.write(','.join(line))
         buffer.write('\n')
         

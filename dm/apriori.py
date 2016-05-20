@@ -147,7 +147,6 @@ def generateRules( L, supportData, minConf=0.7 ):
 
 def apriori(dataSet, minSupport=0.5, minConf=0.7):
     L, suppData = _apriori(dataSet, minSupport)
-    print suppData
     return generateRules(L, suppData, minConf)
 
 def printRules(rules):

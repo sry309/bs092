@@ -12,8 +12,10 @@ create table result
 (
     hid int,
     id varchar(32),
-    res1 varchar(128),
+    res1 varchar(16),
     res2 varchar(256),
+    res3 varchar(16),
+    res4 varchar(16),
     primary key(hid, id),
     foreign key(hid) references history(id)
 ) DEFAULT CHARSET=utf8
