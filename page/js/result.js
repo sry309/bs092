@@ -109,6 +109,7 @@ $(function() {
         }
         else if(type == 'assoc') {
             $('.visual-control').addClass('hidden');
+            loadTotalChartAssoc(list);
             loadDistChartAssoc(list);
         }
         else
@@ -294,6 +295,94 @@ $(function() {
                 .attr('stroke', labelToColor(label));
         }
     };
+    
+    var loadTotalChartAssoc = function(data) {
+        
+        $('#total-svg').empty();
+        
+        supportData = {}
+        for(var i = 0; i < data.length; i++) {
+            elem = data[i];
+            tmp = elem[2].split(' -> ');
+            src = tmp[0];
+            freq = tmp[1].split(', ').concat(src.split(', ')).sort().join(', ');
+            supportData[freq] = elem[3];
+            supportData[src] = elem[4];
+        }
+        var labels = keys(supportData);
+        var counts = values(supportData);
+        
+        var svg = d3.select("#total-svg");
+        var width = svg.attr("width");
+        var height = svg.attr("height") - 30;
+        var xScale = d3.scale.ordinal()
+            .domain(d3.range(counts.length))
+            .rangeRoundBands([0, width]);
+        var yScale = d3.scale.linear()
+            .domain([0,d3.max(counts)])
+            .range([height, 0]);
+        var rectPadding = 4;
+        var rects = svg.selectAll(".rect")
+            .data(counts)
+            .enter()
+            .append("rect")
+            //.attr("class", "MyRect")
+            //.attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            } )
+            .attr("y",function(d){
+                return yScale(d);
+            })
+            .attr("width", xScale.rangeBand() - rectPadding )
+            .attr("height", function(d){
+                return height - yScale(d);
+            })
+            .attr("fill", function(d, i) {
+                return labelToColor(i);
+            });
+            
+        var texts = svg.selectAll(".text")
+            .data(counts)
+            .enter()
+            .append("text")
+            //.attr("class","MyText")
+            //.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            } )
+            .attr("y",function(d){
+                return yScale(d);
+            })
+            .attr("dx",function(){
+                return (xScale.rangeBand() - rectPadding)/2 - 10;
+            })
+            .attr("dy", 20)
+            .text(function(d){
+                return d;
+            })
+            .attr('fill', 'white');
+            
+        var texts = svg.selectAll(".label")
+            .data(labels)
+            .enter()
+            .append("text")
+            //.attr("class","MyText")
+            //.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            } )
+            .attr("y", height)
+            .attr("dx",function(d){
+                var len = d.length * 10;
+                return (xScale.rangeBand() - rectPadding - len) / 2 ;
+            })
+            .attr("dy", 20)
+            .text(function(d){
+                return d;
+            })
+            .attr('fill', 'black');
+    }
     
     var loadDistChartAssoc = function (data) {
         
