@@ -7,6 +7,7 @@ $(function()
       $('.navbar-nav').append('<li><a href="./project.html">项目</a></li>');
       $('.navbar-nav').append('<li><a href="./history.html">历史</a></li>');
       $('.navbar-nav').append('<li id="nav-msg"><a href="./message.html">消息</a></li>');
+      $('.navbar-nav').append('<li><a href="./setting.html">设置</a></li>');
       $('.navbar-nav').append('<li><a href="' + getUrl() + '">返回主站</a></li>');
       $('.navbar-nav').append('<li><a href="./logout.html">退出</a></li>');
     }
