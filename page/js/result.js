@@ -95,7 +95,6 @@ $(function() {
     var loadCharts = function(list) {
         
         if(type == 'cluster' || type == 'classify') {
-            $('.visual-assoc').addClass('hidden');
             
             var keyList = keys(list[0][2]);
         
@@ -109,8 +108,8 @@ $(function() {
             $('#gen-btn').click(function(){genDistChart(list);});
         }
         else if(type == 'assoc') {
-            $('.visual-dist').addClass('hidden');
-            loadAssocChart(list);
+            $('.visual-control').addClass('hidden');
+            loadDistChartAssoc(list);
         }
         else
             throw new Error();
@@ -130,8 +129,7 @@ $(function() {
         var labels = keys(labelCountMap);
         var counts = values(labelCountMap);
         
-        var svg = d3.select("#total-svg")
-            .attr('width', 400).attr('height', 400);
+        var svg = d3.select("#total-svg");
         var width = svg.attr("width");
         var height = svg.attr("height") - 20;
         var xScale = d3.scale.ordinal()
@@ -220,8 +218,7 @@ $(function() {
         var yArr = data.map(function(e){return e[2][yCol];})
         
         var padding = {left: 30, right: 10, top: 10, bottom: 20};
-        var svg = d3.select("#dist-svg")
-            .attr('width', 400).attr('height', 400);
+        var svg = d3.select("#dist-svg");
         var width = svg.attr("width") - padding.left - padding.right;
         var height = svg.attr("height") - padding.top - padding.bottom;
         var xScale = d3.scale.linear()
@@ -298,9 +295,9 @@ $(function() {
         }
     };
     
-    var loadAssocChart = function (data) {
+    var loadDistChartAssoc = function (data) {
         
-        $('#assoc-svg').empty();
+        $('#dist-svg').empty();
         
         var dataDict = {};
         var srcSet = {};
@@ -331,8 +328,7 @@ $(function() {
         
         var padding = {left: 50, right: 0, top: 0, bottom: 20};
         var maxRadius = 15;
-        var svg = d3.select("#assoc-svg")
-            .attr('width', 800).attr('height', 800);
+        var svg = d3.select('#dist-svg');
         var width = svg.attr("width") - padding.left - padding.right;
         var height = svg.attr("height") - padding.top - padding.bottom;
         

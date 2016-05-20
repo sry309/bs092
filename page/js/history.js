@@ -56,7 +56,7 @@ $(function(){
     
     var viewResult = function() {
         event.preventDefault();
-        var id = $(this).parent().parent().data('data-id');
+        var id = $(this).parent().parent().attr('data-id');
         var rsrc = $(this).parent().parent().children('.history-rsrc').text();
         var type = $(this).parent().parent().children('.history-type').attr('data-type');
         localStorage.setItem('resultId', id);
