@@ -1,6 +1,8 @@
 import MySQLdb
 import os
 
+host = 'http://localhost:5000'
+
 db = {
     'host': '127.0.0.1',
     'username': 'root',

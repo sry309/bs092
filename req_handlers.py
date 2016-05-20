@@ -2,6 +2,7 @@
 
 from flask import request, make_response
 import re
+import os
 import config
 import urllib2
 import time
@@ -195,6 +196,8 @@ def apriori(context):
         count += 1
     dbWriteBackAssoc(cursor, result)
     dbAddMessage(cursor, context, hid)
+    try: sendMessageByEmail(cursor, context, hid)
+    except Exception: pass
 
     conn.commit()
     cursor.close()
@@ -225,6 +228,8 @@ def kmedoids(context):
 
     dbWriteBack(cursor, result)
     dbAddMessage(cursor, context, hid)
+    try: sendMessageByEmail(cursor, context, hid)
+    except Exception: pass
 
     conn.commit()
     cursor.close()
@@ -254,6 +259,8 @@ def kmeans(context):
 
     dbWriteBack(cursor, result)
     dbAddMessage(cursor, context, hid)
+    try: sendMessageByEmail(cursor, context, hid)
+    except Exception: pass
 
     conn.commit()
     cursor.close()
@@ -303,6 +310,8 @@ def classify(context):
 
     dbWriteBack(cursor, result)
     dbAddMessage(cursor, context, id)
+    try: sendMessageByEmail(cursor, context, hid)
+    except Exception: pass
 
     conn.commit()
     cursor.close()
@@ -624,3 +633,44 @@ def sendEmail(sender, reciver, subject, content, type='plain'):
     smtp.login(config.smtp['un'], config.smtp['authcode'])  
     smtp.sendmail(config.smtp['un'], reciver, msg.as_string())  
     smtp.quit() 
+    
+def setEmail(uid):
+    email = request.form.get('email')
+    if email is None: email = ""
+    if not re.match(r'^[\w\-\.]+?@(\w+?\.)+?\w{2,4}$', email):
+        return make_response(json.stringify({"succ": False, "msg": "Email format error!"}))
+    conn = config.getConn()
+    cur = conn.cursor()
+    sql = "replace into email (userid, email) values (%s,%s)"
+    cur.execute(sql, (uid, email))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return make_response(json.stringify({"succ": True}))
+
+def dbGetEmail(cur, uid):
+    sql = "select email from email where userid=%s"
+    cur.execute(sql, (uid,))
+    res = cur.fetchall()
+    if len(res) == 0:
+        email = ""
+    else:
+        email = res[0][0]
+    return email
+
+def getEmail(uid):
+    conn = config.getConn()
+    cur = conn.cursor()
+    email = dbGetEmail(cur, uid)
+    conn.commit()
+    cur.close()
+    conn.close()
+    return make_response(json.stringify({"succ": True, "data": email}))
+
+def sendMessageByEmail(cur, context, hid):
+    email = dbGetEmail(cur, context['user'])
+    if not email: return
+    subject = "您提交的任务已完成，资源：{0}，ID：{1}。".format(context['rsrc'], hid);
+    url = os.path.join(config.host, 'history.html#' + str(hid)).replace('\\', '/')
+    content = '<a href="' + url + '">点击这里访问。</a>'
+    sendEmail('test@rmp.com', email, subject, content, 'html')

@@ -26,6 +26,8 @@ app.add_url_rule('/message/<int:uid>/all/', view_func=req_handlers.getMessageAll
 app.add_url_rule('/message/<int:uid>/mark/<int:id>/', view_func=req_handlers.markMessage)
 app.add_url_rule('/message/<int:uid>/mark/all/', view_func=req_handlers.markMessageAll)
 app.add_url_rule('/notify/<int:uid>/', view_func=req_handlers.notify)
+app.add_url_rule('/email/<int:uid>/', view_func=req_handlers.getEmail)
+app.add_url_rule('/email/<int:uid>/update/', view_func=req_handlers.setEmail, methods=['POST'])
 
 @app.route('/<path:path>')
 def staticHtml(path):
