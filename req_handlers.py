@@ -609,3 +609,18 @@ def notify(uid):
     conn.close()
     return make_response(json.stringify({"succ": True, "unread": num}))
 
+def sendEmail(sender, reciver, subject, content, type='plain'):
+    import smtplib  
+    from email.mime.text import MIMEText  
+    
+    msg = MIMEText(content, type, 'utf-8') 
+    msg['Subject'] = subject  
+    msg['From'] = sender
+    msg['To'] = reciver
+    
+    smtp = smtplib.SMTP()  
+    smtp.connect(config.smtp['server'])  
+    smtp.starttls()
+    smtp.login(config.smtp['un'], config.smtp['authcode'])  
+    smtp.sendmail(config.smtp['un'], reciver, msg.as_string())  
+    smtp.quit() 

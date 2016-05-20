@@ -9,6 +9,12 @@ db = {
     'name': 'test'
 }
 
+smtp = {
+    'server': 'smtp.qq.com',
+    'un': 'wizard.z@qq.com',
+    'authcode': 'juganzlzmlfhbdja'
+}
+
 rmp = 'http://202.120.40.73:28080'
 #rmp = 'http://localhost:5000'
 
