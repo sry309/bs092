@@ -33,11 +33,12 @@ $(function() {
         $('.msg-well').remove();
         for(var i = 0; i < list.length; i++) {
             var elem = list[i];
+            var hid = /ID：(\d+)/.exec(elem.content)[1];
             
             var $well = $('<div class="well msg-well"></div>');
             $well.attr('data-id', elem.id);
             if(elem.isread) $well.addClass('msg-read');
-            $link = $('<a href="#" class="msg-link"></a>');
+            $link = $('<a href="history.html#' + hid + '" class="msg-link"></a>');
             $link.text(elem.content);
             $well.append($link);
             
@@ -53,7 +54,7 @@ $(function() {
             $('#msg-li').append($well);
         }
         $('.msg-mark').click(markRead);
-        $('.msg-link').click(viewResult);
+        //$('.msg-link').click(viewResult);
     };
     
     var markRead = function() {
@@ -76,7 +77,7 @@ $(function() {
         });
     }
     
-    var viewResult = function() {
+    /*var viewResult = function() {
         event.preventDefault();
         id = /ID：(\d+)/.exec($(this).text())[1];
         $.ajax({
@@ -95,7 +96,7 @@ $(function() {
         }).fail(function(data) {
             alert('Network error!');
         });
-    }
+    }*/
     
     getMessage(false);
 });

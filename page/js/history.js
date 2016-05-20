@@ -52,6 +52,7 @@ $(function(){
         }
         
         $('.view-result').click(viewResult);
+        redirToResult(location.hash.slice(1));
     }
     
     var viewResult = function() {
@@ -64,6 +65,16 @@ $(function(){
         localStorage.setItem('resultType', type);
         location.href = './result.html';
     }
+    
+    var redirToResult = function(id) {
+        if(!id) return;
+        var $li = $('.history-row');
+        for(var i = 0; i < $li.length; i++) {
+            $row = $li.eq(i);
+            if($row.attr('data-id') == id)
+                $row.find('.view-result').click();
+        }
+    };
     
     getHistory();
 });
