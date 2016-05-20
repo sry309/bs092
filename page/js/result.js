@@ -428,6 +428,38 @@ $(function() {
             .domain(d3.range(srcList.length))
             .rangeRoundBands([0, height]);
         
+        var hLine = svg.selectAll(".line")
+            .data(srcList)
+            .enter()
+            .append("line")
+            .attr('x1', xScale(0) + xScale.rangeBand() / 2)
+            .attr('x2', xScale(dstList.length - 1) + xScale.rangeBand() / 2)
+            .attr('y1', function(d, i) {
+                return height - yScale(i) - yScale.rangeBand() / 2;
+            })
+            .attr('y2', function(d, i) {
+                return height - yScale(i) - yScale.rangeBand() / 2;
+            })
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr('stroke', '#ccc')
+            .attr('stroke-dasharray', '5,5');
+        
+        var vLines = svg.selectAll(".line")
+            .data(dstList)
+            .enter()
+            .append("line")
+            .attr('x1', function(d,i){
+                return xScale(i) + xScale.rangeBand() / 2;
+            })
+            .attr('x2', function(d,i){
+                return xScale(i) + xScale.rangeBand() / 2;
+            })
+            .attr('y1', yScale(0) + yScale.rangeBand() / 2)
+            .attr('y2', yScale(srcList.length - 1) + yScale.rangeBand() / 2)
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr('stroke', '#ccc')
+            .attr('stroke-dasharray', '5,5');
+        
         var circles = svg.selectAll('.circle')
             .data(points)
             .enter()
@@ -480,6 +512,8 @@ $(function() {
             })
             .attr("transform","translate(0," + padding.top + ")")
             .attr('fill', 'black');
+            
+        
     }
     
     getResult();
