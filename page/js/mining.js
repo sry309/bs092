@@ -98,10 +98,7 @@ $(function(){
             return;
         }
         
-        var cols = [];
-        for(var k in selected)
-            cols.push(k);
-        
+        var cols = keys(selected);
         if(cols.length == 0)
         {
             alert('请选择要挖掘的列！');
@@ -109,9 +106,26 @@ $(function(){
         }
         cols = JSON.stringify(cols);
         
+        var args = {}
+        if(algo == "apriori") {
+            var minSupport = $('#apriori-min-support').val();
+            var minConf = $('#apriori-min-conf').val();
+            minSupport = parseFloat(minSupport);
+            minConf = parseFloat(minConf);
+            if(isNaN(minSupport) || isNaN(minConf)) {
+                alert('参数格式有误！');
+                return;
+            }
+            args = {
+                minSupport: minSupport,
+                minConf: minConf
+            }
+        }
+        args = JSON.stringify(args);
+        
         var url = './mining/' + uid + '/' + token + '/' + proj + '/' + rsrc + '/';
         var data = 'algo=' + algo + '&start=' + start + "&count=" + 
-            count + '&cols=' + cols + '&title=' + title;
+            count + '&cols=' + cols + '&title=' + title + '&args=' + args;
         
         if(type == "classify")
         {
@@ -163,6 +177,9 @@ $(function(){
             $('<option value="' + type + '">' + algoDict[type] + '</option>').appendTo($typeCombo);
         $typeCombo.on('change', changeAlgoType);
         changeAlgoType.call($typeCombo);
+        var $algoCombo = $('#algo-combo');
+        $algoCombo.on('change', changeAlgo);
+        changeAlgo.call($algoCombo);
     };
     
     var changeAlgoType = function() {
@@ -185,6 +202,9 @@ $(function(){
             $('#prepro-panel').addClass('hidden');
         else
             $('#prepro-panel').removeClass('hidden')
+        
+        $algoCombo.on('change', changeAlgo);
+        changeAlgo.call($algoCombo);
     };
     
     var absentComboOnClick = function() {
@@ -192,6 +212,13 @@ $(function(){
             $('.fillval').removeClass('hidden');
         else
             $('.fillval').addClass('hidden');
+    };
+    
+    var changeAlgo = function() {
+        $('.args').addClass('hidden');
+        var algo = $('#algo-combo').val();
+        if(algo == "apriori")
+            $('#apriori-arg').removeClass('hidden');
     };
     
     getCols();

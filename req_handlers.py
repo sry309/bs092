@@ -79,6 +79,7 @@ def mining(uid, token, proj, rsrc):
     algo = request.form.get('algo')
 
     args = request.form.get('args')
+    print args
     if args:
         args = json.parse(args)
         assert isinstance(args, dict)
@@ -180,7 +181,7 @@ def apriori(context):
         context['end'], context['cols'])
     dataList = convertDataToArr(data)
 
-    rawRes = dm.apriori(dataList)
+    rawRes = dm.apriori(dataList, **context['args'])
 
     conn = config.getConn()
     cursor = conn.cursor()

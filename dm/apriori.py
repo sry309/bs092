@@ -145,7 +145,11 @@ def generateRules( L, supportData, minConf=0.7 ):
     return bigRuleList
 
 
-def apriori(dataSet, minSupport=0.5, minConf=0.7):
+def apriori(dataSet, **kwargs):
+    minSupport = kwargs.get('minSupport')
+    if minSupport is None: minSupport = 0.5
+    minConf = kwargs.get('minConf')
+    if minConf is None: minConf = 0.7
     L, suppData = _apriori(dataSet, minSupport)
     return generateRules(L, suppData, minConf)
 
