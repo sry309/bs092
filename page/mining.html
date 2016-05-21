@@ -180,6 +180,48 @@
                 </div>
             </div>
         </div>
+        <!-- -->
+        <div class="panel-body args" id="kmeans-arg">
+            <div class='row'>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">标签数</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="kmeans-label-num" value="8" />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">最大迭代数</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="kmeans-max-iter" value="300" />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">最大迭代数</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <select class="form-control" id="kmeans-init">
+                        <option value="k-means++">k-means++</option>
+                        <option value="random">随机</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">预计算距离</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <select class="form-control" id="kmeans-pre-dist">
+                        <option value="auto">自动</option>
+                        <option value="true">是</option>
+                        <option value="false">否</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">容忍度</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="kmeans-tol" value="1e-4" />
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class='row'>

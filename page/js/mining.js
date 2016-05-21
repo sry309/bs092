@@ -121,11 +121,40 @@ $(function(){
                 minConf: minConf
             }
         }
+        else if(algo == "kmeans") {
+            var n_clusters = $('#kmeans-label-num').val();
+            n_clusters = parseInt(n_clusters);
+            var max_iter = $('#kmeans-max-iter').val();
+            max_iter = parseInt(max_iter);
+            var init = $('#kmeans-init').val();
+            var precompute_distances = $('#kmeans-pre-dist').val();
+            if(precompute_distances == 'true') 
+                precompute_distances = true;
+            else if(precompute_distances == 'false') 
+                precompute_distances = false;
+            tol = $('#kmeans-tol').val();
+            tol = parseFloat(tol);
+            if(isNaN(n_clusters) || isNaN(max_iter) || 
+                ['k-means++', 'random'].indexOf(init) == -1 ||
+                ['auto', true, false].indexOf(precompute_distances) == -1 ||
+                isNaN(tol)) {
+                alert('参数格式有误！');
+                return;
+            }
+            args = {
+                n_clusters: n_clusters,
+                max_iter: max_iter,
+                init: init,
+                precompute_distances: precompute_distances,
+                tol: tol
+            };
+        }
         args = JSON.stringify(args);
         
         var url = './mining/' + uid + '/' + token + '/' + proj + '/' + rsrc + '/';
         var data = 'algo=' + algo + '&start=' + start + "&count=" + 
-            count + '&cols=' + cols + '&title=' + title + '&args=' + args;
+            count + '&cols=' + encodeURIComponent(cols) + '&title=' + 
+            encodeURIComponent(title) + '&args=' + encodeURIComponent(args);
         
         if(type == "classify")
         {
@@ -219,6 +248,8 @@ $(function(){
         var algo = $('#algo-combo').val();
         if(algo == "apriori")
             $('#apriori-arg').removeClass('hidden');
+        else if (algo == "kmeans")
+            $('#kmeans-arg').removeClass('hidden');
     };
     
     getCols();

@@ -85,6 +85,7 @@ def mining(uid, token, proj, rsrc):
         assert isinstance(args, dict)
     else:
         args = {}
+    # TODO: filter args
 
     context = {
         "user": uid,
@@ -247,7 +248,7 @@ def kmeans(context):
     dataList = preprocess(dataList, context)
 
     from sklearn.cluster import KMeans
-    clf = KMeans()
+    clf = KMeans(**context['args'])
     clf.fit(dataList)
 
     conn = config.getConn()
