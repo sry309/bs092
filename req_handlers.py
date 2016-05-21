@@ -215,7 +215,7 @@ def kmedoids(context):
     dataList = convertDataToArr(data)
     dataList = preprocess(dataList, context)
 
-    _, _, rawRes = dm.kmedoids(dataList)
+    _, _, rawRes = dm.kmedoids(dataList, **context['args'])
 
     conn = config.getConn()
     cursor = conn.cursor()

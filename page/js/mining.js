@@ -149,6 +149,17 @@ $(function(){
                 tol: tol
             };
         }
+        else if(algo == "kmedoids") {
+            var k = $('#kmedoids-label-num').val();
+            k = parseInt(k);
+            if(isNaN(k)) {
+                alert('参数格式有误！');
+                return;
+            }
+            args = {
+                k: k
+            };
+        }
         args = JSON.stringify(args);
         
         var url = './mining/' + uid + '/' + token + '/' + proj + '/' + rsrc + '/';
@@ -250,6 +261,8 @@ $(function(){
             $('#apriori-arg').removeClass('hidden');
         else if (algo == "kmeans")
             $('#kmeans-arg').removeClass('hidden');
+        else if (algo == "kmedoids")
+            $('#kmedoids-arg').removeClass('hidden');
     };
     
     getCols();
