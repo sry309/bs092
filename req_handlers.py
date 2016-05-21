@@ -285,6 +285,10 @@ def classify(context):
         classifier = MultinomialNB
     else:
         assert False
+    args = context['args']
+    for k in args:
+        if isinstance(args[k], unicode):
+            args[k] = str(args[k])
 
     rawData = getDataFromSvr(context['rsrc'])
     if(context['distinct']):
@@ -298,7 +302,7 @@ def classify(context):
     predictList = convertDataToArr(predict)
     predictList = preprocess(predictList, context)
 
-    clf = classifier()
+    clf = classifier(**args)
     clf.fit(trainList, labelList)
     rawRes = clf.predict(predictList)
 

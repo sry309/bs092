@@ -233,6 +233,76 @@
                 </div>
             </div>
         </div>
+        <!-- -->
+        <div class="panel-body args" id="svm-arg">
+            <div class='row'>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">C</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="svm-c" value="1.0" />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">Kernel</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <select class="form-control" id="svm-kernel">
+                        <option value="rbf">rbf</option>
+                        <option value="linear">linear</option>
+                        <option value="poly">poly</option>
+                        <option value="sigmoid">sigmoid</option>
+                        <option value="precomputed">precomputed</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">Degree</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="svm-degree" value="3" />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">Gamma</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="svm-gamma" value="auto" />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">Coef0</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="svm-coef0" value="0.0" />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">Probability</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <select class="form-control" id="svm-probability">
+                        <option value="false">false</option>
+                        <option value="true">true</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">Shrinking</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <select class="form-control" id="svm-shrinking">
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <p class="form-label">Tol</p>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <input type="text" class="form-control" id="svm-tol" value="1e-3" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="form-label">参数的详细解释请见<a href='http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html'>sklearn.svm.SVC</a>文档。</p>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class='row'>

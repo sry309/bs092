@@ -122,18 +122,12 @@ $(function(){
             }
         }
         else if(algo == "kmeans") {
-            var n_clusters = $('#kmeans-label-num').val();
-            n_clusters = parseInt(n_clusters);
-            var max_iter = $('#kmeans-max-iter').val();
-            max_iter = parseInt(max_iter);
+            var n_clusters = parseInt($('#kmeans-label-num').val());
+            var max_iter = parseInt($('#kmeans-max-iter').val());
             var init = $('#kmeans-init').val();
             var precompute_distances = $('#kmeans-pre-dist').val();
-            if(precompute_distances == 'true') 
-                precompute_distances = true;
-            else if(precompute_distances == 'false') 
-                precompute_distances = false;
-            tol = $('#kmeans-tol').val();
-            tol = parseFloat(tol);
+            if(precompute_distances != 'auto') precompute_distances = precompute_distances == 'true'
+            tol = parseFloat($('#kmeans-tol').val());
             if(isNaN(n_clusters) || isNaN(max_iter) || 
                 ['k-means++', 'random'].indexOf(init) == -1 ||
                 ['auto', true, false].indexOf(precompute_distances) == -1 ||
@@ -159,6 +153,33 @@ $(function(){
             args = {
                 k: k
             };
+        }
+        else if (algo == "svm") {
+            var C = parseFloat($('#svm-c').val());
+            var kernel = $('#svm-kernel').val();
+            var degree = parseInt($('#svm-degree').val());
+            var gamma = $('#svm-gamma').val();
+            if(gamma != 'auto') gamma = parseFloat(gamma);
+            var coef0 = parseFloat($('#svm-coef0').val());
+            var probability = $('#svm-probability').val() == 'true';
+            var shrinking = $('#svm-shrinking').val() == 'true';
+            var tol = parseFloat($('#svm-tol').val());
+            if(isNaN(C) || isNaN(degree) || (gamma != 'auto' && isNaN(gamma)) || 
+                isNaN(coef0) || isNaN(tol)) {
+                alert('参数格式有误！');
+                return;
+            }
+            args = {
+                C: C,
+                kernel: kernel,
+                degree: degree,
+                gamma: gamma,
+                coef0: coef0,
+                probability: probability,
+                shrinking: shrinking,
+                tol: tol
+            }
+            console.log(args);
         }
         args = JSON.stringify(args);
         
@@ -263,6 +284,8 @@ $(function(){
             $('#kmeans-arg').removeClass('hidden');
         else if (algo == "kmedoids")
             $('#kmedoids-arg').removeClass('hidden');
+        else if (algo == "svm")
+            $('#svm-arg').removeClass('hidden');
     };
     
     getCols();
